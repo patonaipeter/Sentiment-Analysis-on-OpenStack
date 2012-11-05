@@ -26,10 +26,12 @@ public class ServiceImpl implements IService {
             Registry registry = null;
             try{
             	registry = LocateRegistry.getRegistry();
+            	registry.rebind(name, stub);
             }catch(RemoteException e){
             	registry = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
+            	registry.rebind(name, stub);
             }
-            registry.rebind(name, stub);
+            
             System.out.println("TSA Service ready on port: " + Registry.REGISTRY_PORT);
         } catch (Exception e) {
             e.printStackTrace();
