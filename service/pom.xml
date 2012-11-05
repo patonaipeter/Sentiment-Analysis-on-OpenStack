@@ -18,7 +18,7 @@
        <artifactId>exec-maven-plugin</artifactId>
        <version>1.1</version>
        <configuration>
-         <mainClass>aic.service.test.SimpleTest</mainClass>
+         <mainClass>aic.service.ServiceImpl</mainClass>
        </configuration>
      </plugin>
    </plugins>

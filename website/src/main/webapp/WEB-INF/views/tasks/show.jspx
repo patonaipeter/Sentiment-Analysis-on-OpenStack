@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:show id="ps_at_ac_tuwien_frontend_website_domain_Task" object="${task}" path="/tasks" z="jHG8SJ4tB1ODOr57KjP3ywiPsnM=">
+        <field:display field="taskName" id="s_at_ac_tuwien_frontend_website_domain_Task_taskName" object="${task}" z="DzlenuthlEDMNIauecDaHSmzGdY="/>
+        <field:display field="description" id="s_at_ac_tuwien_frontend_website_domain_Task_description" object="${task}" z="5oAmBlQpHYS2Q4wsBxGrJuQhVzc="/>
+        <field:display field="keyword" id="s_at_ac_tuwien_frontend_website_domain_Task_keyword" object="${task}" z="1gSQI9qs7EIwbghVRLiZ4kaGD9k="/>
+        <field:display field="sentiment" id="s_at_ac_tuwien_frontend_website_domain_Task_sentiment" object="${task}" z="n65KWrayiFeSqhPJjsjwEW5LAWs="/>
+    </page:show>
+</div>

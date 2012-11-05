@@ -1,0 +1,30 @@
+project --topLevelPackage at.ac.tuwien.frontend.website
+
+jpa setup --provider HIBERNATE --database HYPERSONIC_PERSISTENT
+
+entity jpa --class ~.domain.Task --testAutomatically
+field string taskName --notNull --sizeMin 1 --sizeMax 30
+field string description --sizeMax 80
+field string keyword --sizeMin 1 --sizeMax 30
+field number --fieldName sentiment --type java.lang.Double
+web mvc setup
+web mvc scaffold ~.web.TaskController
+
+entity jpa --class CloudUser --testAutomatically
+field string userName --sizeMin 1 --sizeMax 30
+field string password --sizeMin 1 --sizeMax 30
+field string company --sizeMin 1 --sizeMax 30
+field string email --sizeMin 1 --sizeMax 30
+web mvc scaffold ~.web.CloudUserController
+
+web mvc controller ~.web.PublicCloudUserController --preferredMapping /public
+
+web mvc language --code de
+
+logging setup --level WARN --package WEB
+
+security setup
+
+finder list --class ~.domain.Task --depth 2 --filter reg
+
+logging setup --level INFO
