@@ -28,12 +28,13 @@ public class SimpleBroker implements IService{
             try{
             	//get existing registry
             	registry = LocateRegistry.getRegistry();
+            	registry.rebind(name, stub);
             }catch(RemoteException e){
             	//create new registry
             	registry = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
+            	registry.rebind(name, stub);
             }
-            registry.rebind(name, stub);
-            System.out.println("TSA Service ready on port: " + Registry.REGISTRY_PORT);
+            System.out.println("Broker Service ready on port: " + Registry.REGISTRY_PORT);
         } catch (Exception e) {
             e.printStackTrace();
         }
