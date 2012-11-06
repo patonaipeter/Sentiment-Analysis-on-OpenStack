@@ -1,28 +1,30 @@
 package aic.broker;
 
+import java.net.MalformedURLException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.List;
 
 import aic.service.IService;
 
 public class SimpleBroker implements IService{
-	private IService service;
+	private List<IService> services=new ArrayList<IService>();
 	
-	public SimpleBroker(IService service) {
-		super();
-		this.service=service;
+	public SimpleBroker() throws MalformedURLException, RemoteException, NotBoundException {
+    	//this simple demo broker has just one Worker Service on localhost which is fixed
+    	IService service=(IService)Naming.lookup("rmi://localhost/TSA");
+    	services.add(service);
 	}
 	
 	public static void main(String[] args) throws Exception {
         try {
-        	//this simple broker has just one Worker Service on localhost which is fixed
-        	IService service=(IService)Naming.lookup("rmi://localhost/TSA");
-        	
             String name = "Broker";
-            SimpleBroker broker=new SimpleBroker(service);
+            SimpleBroker broker=new SimpleBroker();
             IService stub =(IService) UnicastRemoteObject.exportObject(broker, 0);
             Registry registry = null;
             try{
@@ -40,9 +42,15 @@ public class SimpleBroker implements IService{
         }
 
 	}
+	
+	private synchronized IService getAvailableService(){
+		//TODO implement real broker
+		return services.get(0);
+	}
 
+	//gets called from the frontend
 	public double analyseSentiment(String company) throws RemoteException {
-		return service.analyseSentiment(company);
+		return getAvailableService().analyseSentiment(company);
 	}
 	
 }
