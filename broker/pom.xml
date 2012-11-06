@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>aic.broker</groupId>
   <artifactId>broker</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.1</version>
   
    <build>
    <plugins>
@@ -14,6 +14,27 @@
          <mainClass>aic.broker.SimpleBroker</mainClass>
        </configuration>
      </plugin>
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>aic.broker.SimpleBroker</mainClass>
+                    </manifest>
+                </archive>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+            </configuration>
+        </plugin>
    </plugins>
  </build>
+   <dependencies>
+   	<dependency>
+   		<groupId>aic.service</groupId>
+   		<artifactId>service</artifactId>
+   		<version>0.1</version>
+   		<scope>compile</scope>
+   	</dependency>
+   </dependencies>
 </project>

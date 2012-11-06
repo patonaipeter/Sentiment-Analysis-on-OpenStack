@@ -21,6 +21,19 @@
          <mainClass>aic.service.ServiceImpl</mainClass>
        </configuration>
      </plugin>
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>aic.service.ServiceImpl</mainClass>
+                    </manifest>
+                </archive>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+            </configuration>
+        </plugin>
    </plugins>
  </build>
 

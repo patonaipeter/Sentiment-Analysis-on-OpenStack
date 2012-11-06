@@ -1,1 +1,6 @@
 /target
+/files/train_doc.txt
+/files/test1.arff
+/files/test_doc.txt
+/files/train1.arff
+/files/weka.classifiers.bayes.NaiveBayes.model
