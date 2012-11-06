@@ -1,5 +1,6 @@
 package aic.service;
 
+import java.lang.management.ManagementFactory;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -10,6 +11,7 @@ import aic.service.analyzer.MongoAnalyzer;
 
 public class ServiceImpl implements IService {
 	private IAnalyzer analyser;
+	private volatile int counter;
 	
 	public ServiceImpl(IAnalyzer analyser) {
 		super();
@@ -38,10 +40,37 @@ public class ServiceImpl implements IService {
         }
 
 	}
+	
 	@Override
-	public double analyseSentiment(String company) throws RemoteException {
+	public double getSystemLoad(){
+		return ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
+	}
+	
+	@Override
+	public boolean isBusy(){
+		return counter!=0;
+	}
+	
+	@Override
+	public long getUsedMemory(){
+		Runtime rt = Runtime.getRuntime();
+		return rt.totalMemory()-rt.freeMemory();
+	}
+	
+	@Override
+	public synchronized double analyseSentiment(String company) {
 		Pattern p=Pattern.compile(".*"+company+".*", Pattern.CASE_INSENSITIVE);
+		
+		/*
+		 * if analyser is thread safe we could 
+		 * allow multiple parallel calls to analyseSentiment,
+		 * use an AtomicInteger as a counter and remove synchronized
+		 * but its likely that its not thread safe...
+		 */
+		counter++;
 		double r=analyser.analyze(p);
+		counter--;
+		
 		System.out.println("Rating for " + company + ": " + r);
 		return r;
 	}

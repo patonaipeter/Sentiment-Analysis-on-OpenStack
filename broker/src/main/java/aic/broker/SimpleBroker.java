@@ -1,5 +1,6 @@
 package aic.broker;
 
+import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -51,6 +52,19 @@ public class SimpleBroker implements IService{
 	//gets called from the frontend
 	public double analyseSentiment(String company) throws RemoteException {
 		return getAvailableService().analyseSentiment(company);
+	}
+
+	public double getSystemLoad(){
+		return ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
+	}
+	
+	public long getUsedMemory(){
+		Runtime rt = Runtime.getRuntime();
+		return rt.totalMemory()-rt.freeMemory();
+	}
+
+	public boolean isBusy(){
+		return false;
 	}
 	
 }
