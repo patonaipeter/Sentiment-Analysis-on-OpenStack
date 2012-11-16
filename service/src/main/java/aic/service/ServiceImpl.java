@@ -79,7 +79,7 @@ public class ServiceImpl implements IService {
 		double r=analyser.analyze(p,split,index);
 		counter--;
 		
-		System.out.println("Rating for " + company + ": " + r);
+		//System.out.println("Rating for " + company + ": " + r);
 		return r;
 	}
 }

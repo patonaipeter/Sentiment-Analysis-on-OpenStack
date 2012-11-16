@@ -66,14 +66,14 @@ public class MongoAnalyzer implements IAnalyzer {
 		DBCursor cursor = tweetsCollection.find(dbo);
 		
 		
-		if(split>1 && index<split && index>0){
+		if(split>1 && index<split && index>=0){
 			/*
 			 * propably very inefficient 
 			 * since for this the whole db
 			 * must be scanned
 			 */
 			int count=cursor.count();
-			if(split>count){
+			if(split<count){
 				int limit=count/split;
 				cursor=cursor.skip(index*limit);
 				if(index<split-1){
