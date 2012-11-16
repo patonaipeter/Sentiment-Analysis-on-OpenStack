@@ -66,5 +66,11 @@ public class SimpleBroker implements IService{
 	public boolean isBusy(){
 		return false;
 	}
+
+	@Override
+	public double analyseSentiment(String company, int split, int index)
+			throws RemoteException {
+		return getAvailableService().analyseSentiment(company,split,index);
+	}
 	
 }
