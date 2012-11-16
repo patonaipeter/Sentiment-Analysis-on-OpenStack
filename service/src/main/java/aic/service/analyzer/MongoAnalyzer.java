@@ -57,10 +57,36 @@ public class MongoAnalyzer implements IAnalyzer {
 	}
 
 	public double analyze(Pattern pattern) {
+		return analyze(pattern, 1,1);
+	}
+	
+	public double analyze(Pattern pattern, int split,int index){
 		BasicDBObject dbo = new BasicDBObject();
 		dbo.put("text", pattern);
 		DBCursor cursor = tweetsCollection.find(dbo);
+		
+		
+		if(split>1 && index<split && index>0){
+			/*
+			 * propably very inefficient 
+			 * since for this the whole db
+			 * must be scanned
+			 */
+			int count=cursor.count();
+			if(split>count){
+				int limit=count/split;
+				cursor=cursor.skip(index*limit);
+				if(index<split-1){
+					cursor=cursor.limit(limit);
+					count=limit;
+				}else{
+					count-=index*limit;
+				}
+			}
+		}
+		
 		double rating = 0;
+		int count = 0;
 		while (cursor.hasNext()) {
 			DBObject tweet = cursor.next();
 			try {
@@ -71,12 +97,13 @@ public class MongoAnalyzer implements IAnalyzer {
 				 */
 				double r = wc.classifyDouble(text);
 				rating += r;
+				count++;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		return rating / cursor.count();
+		return rating / count;
 	}
 
 }

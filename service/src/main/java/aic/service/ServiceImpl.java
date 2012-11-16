@@ -42,23 +42,30 @@ public class ServiceImpl implements IService {
 	}
 	
 	@Override
-	public double getSystemLoad(){
+	public double getSystemLoad() throws RemoteException {
 		return ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
 	}
 	
 	@Override
-	public boolean isBusy(){
+	public boolean isBusy() throws RemoteException {
 		return counter!=0;
 	}
 	
 	@Override
-	public long getUsedMemory(){
+	public long getUsedMemory() throws RemoteException {
 		Runtime rt = Runtime.getRuntime();
 		return rt.totalMemory()-rt.freeMemory();
 	}
 	
 	@Override
-	public synchronized double analyseSentiment(String company) {
+	public double analyseSentiment(String company) throws RemoteException {
+		return analyseSentiment(company,1,1);
+	}
+
+	@Override
+	public synchronized double analyseSentiment(String company, int split, int index)
+			throws RemoteException {
+		
 		Pattern p=Pattern.compile(".*"+company+".*", Pattern.CASE_INSENSITIVE);
 		
 		/*
@@ -67,8 +74,9 @@ public class ServiceImpl implements IService {
 		 * use an AtomicInteger as a counter and remove synchronized
 		 * but its likely that its not thread safe...
 		 */
+		
 		counter++;
-		double r=analyser.analyze(p);
+		double r=analyser.analyze(p,split,index);
 		counter--;
 		
 		System.out.println("Rating for " + company + ": " + r);
