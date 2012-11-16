@@ -78,9 +78,6 @@ public class MongoAnalyzer implements IAnalyzer {
 				cursor=cursor.skip(index*limit);
 				if(index<split-1){
 					cursor=cursor.limit(limit);
-					count=limit;
-				}else{
-					count-=index*limit;
 				}
 			}
 		}
