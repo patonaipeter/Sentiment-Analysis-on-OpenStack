@@ -17,15 +17,20 @@ public class MongoWriter implements ITweetWriter {
 
 	private DBCollection tweetsCollection;
 
-	public MongoWriter(String db) {
+	public MongoWriter(String host, String db) {
 		try {
-			this.mongo = new Mongo("localhost");
+			this.mongo = new Mongo(host);
 			this.db = mongo.getDB(db);
 			this.tweetsCollection = this.db.getCollection("tweets");
 			this.tweetsCollection.remove(new BasicDBObject());
 		} catch (UnknownHostException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Deprecated
+	public MongoWriter(String db) {
+		this("localhost", db);
 	}
 
 	@Override

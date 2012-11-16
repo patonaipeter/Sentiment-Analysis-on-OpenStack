@@ -2,6 +2,7 @@ package aic.data;
 
 import java.io.FileInputStream;
 
+import net.sf.json.JSONException;
 import aic.data.dto.Tweet;
 
 public class DataLoader {
@@ -22,13 +23,19 @@ public class DataLoader {
 			ITweetReader reader = new JsonLikeReader(new FileInputStream(args[0]));
 			Tweet t = reader.read();
 
-			ITweetWriter writer = new MongoWriter("tweets");
+			ITweetWriter writer = new MongoWriter("localhost", "tweets");
 			int cnt = 0;
-			while (t != null) {
-				cnt++;
-				writer.write(t);
-				t = reader.read();
-			}
+			do {
+				try {
+					t = reader.read();
+					if (t != null) {
+						writer.write(t);
+						cnt++;
+					}
+				} catch (JSONException e) {
+
+				}
+			} while (t != null);
 			System.out.println("Written " + cnt + " tweets.");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
