@@ -4,4 +4,5 @@ import aic.data.dto.Tweet;
 
 public interface ITweetWriter {
 	public void write(Tweet tweet);
+	public void index();
 }

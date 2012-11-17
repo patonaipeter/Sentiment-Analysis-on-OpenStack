@@ -36,6 +36,8 @@ public class DataLoader {
 
 				}
 			} while (t != null);
+			//add indexes
+			writer.index();
 			System.out.println("Written " + cnt + " tweets.");
 		} catch (Exception e) {
 			throw new RuntimeException(e);

@@ -74,6 +74,11 @@ public class MongoWriter implements ITweetWriter {
 		dbo.put("keywords", getKeywords(tweet.getText()));
 		dbo.put("sentiment", tweet.getSentiment());
 		this.tweetsCollection.insert(dbo);
+		
+	}
+
+	@Override
+	public void index() {
 		this.tweetsCollection.ensureIndex( new BasicDBObject("keywords", 1) );
 	}
 }
