@@ -56,10 +56,10 @@ public class MongoWriter implements ITweetWriter {
 	private String[] getKeywords(String text){
 		Set<String> out=new HashSet<String>();
 		//split on word boundary
-		String[] words=text.split("\\b");
+		String[] words=text.split("\\W+");
 		for(String word : words){
-			word=word.toLowerCase();
-			if(!noiseWords.contains(word)){
+			word=word.toLowerCase().trim();
+			if(word.length()>2 && !"".equals(word) && !noiseWords.contains(word)){
 				out.add(word);
 			}
 		}
