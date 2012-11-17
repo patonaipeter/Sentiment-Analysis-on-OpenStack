@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 public interface IAnalyzer {
 
-	public double analyze(Pattern pattern);
+	public double analyze(String company);
 	
-	public double analyze(Pattern pattern, int split,int index);
+	public double analyze(String company, int split,int index);
 }

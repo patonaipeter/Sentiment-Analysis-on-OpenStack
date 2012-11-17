@@ -65,9 +65,6 @@ public class ServiceImpl implements IService {
 	@Override
 	public synchronized double analyseSentiment(String company, int split, int index)
 			throws RemoteException {
-		
-		Pattern p=Pattern.compile(".*"+company+".*", Pattern.CASE_INSENSITIVE);
-		
 		/*
 		 * if analyser is thread safe we could 
 		 * allow multiple parallel calls to analyseSentiment,
@@ -76,7 +73,7 @@ public class ServiceImpl implements IService {
 		 */
 		
 		counter++;
-		double r=analyser.analyze(p,split,index);
+		double r=analyser.analyze(company,split,index);
 		counter--;
 		
 		//System.out.println("Rating for " + company + ": " + r);

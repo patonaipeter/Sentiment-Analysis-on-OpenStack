@@ -56,13 +56,13 @@ public class MongoAnalyzer implements IAnalyzer {
 		}
 	}
 
-	public double analyze(Pattern pattern) {
-		return analyze(pattern, 1,1);
+	public double analyze(String company) {
+		return analyze(company, 1,1);
 	}
 	
-	public double analyze(Pattern pattern, int split,int index){
+	public double analyze(String company, int split,int index){
 		BasicDBObject dbo = new BasicDBObject();
-		dbo.put("text", pattern);
+		dbo.put("keywords", company.toLowerCase());
 		DBCursor cursor = tweetsCollection.find(dbo);
 		
 		
@@ -92,7 +92,7 @@ public class MongoAnalyzer implements IAnalyzer {
 				 * System.out.println("----------------");
 				 * System.out.println(text); System.out.println(r);
 				 */
-				double r = wc.classifyDouble(text);
+				double r = (Double)tweet.get("sentiment");
 				rating += r;
 				count++;
 			} catch (Exception e) {
