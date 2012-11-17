@@ -15,6 +15,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MapReduceCommand;
+import com.mongodb.MapReduceOutput;
 import com.mongodb.Mongo;
 
 public class MongoAnalyzer implements IAnalyzer {
@@ -100,16 +101,16 @@ public class MongoAnalyzer implements IAnalyzer {
 
 		return rating / count;*/
 		
-		//try out map/reduce
-		String map="function(){emit(0,{sentiment: this.sentiment});};";
-		String reduce="function(key,values){" +
-				"var result = 0.0;" +
-			    "values.forEach(function(value) {" +
-			    "  result += value.sentiment;" +
-			    "});" +
-			    "return { sentiment: result/values.length };" +
-				"};";
-		return (Double)tweetsCollection.mapReduce(map, reduce, null,MapReduceCommand.OutputType.INLINE, dbo).results().iterator().next().get("sentiment");
+        //try out map/reduce
+		String map = "function(){emit(null,{sentiment: this.sentiment});};";
+		String reduce = "function(key,values){" + "var result = 0.0;"
+				+ "values.forEach(function(value) {"
+				+ "  result += value.sentiment;" + "});"
+				+ "return { sentiment: result/values.length };" + "};";
+		MapReduceOutput out = tweetsCollection.mapReduce(map, reduce, null,
+				MapReduceCommand.OutputType.INLINE, dbo);
+		return (Double) ((DBObject) out.results().iterator().next()
+				.get("value")).get("sentiment");
 	}
 
 }
