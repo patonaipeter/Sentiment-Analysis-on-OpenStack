@@ -60,7 +60,13 @@ public class JsonLikeReader implements ITweetReader {
 		try {
 			sentiment = wc.classifyDouble(objIn.getString("text"));
 		} catch (Exception e) {
-			throw new IOException(e);
+			System.err.println("Input: " + objIn.getString("text"));
+			e.printStackTrace();
+			
+			//ignore stupid exceptions, because there are bugs in the 
+			//sentiment analysis framework 0.5 should not influence the result
+			sentiment=0.5;
+			//throw new IOException(e);
 		}
 		Tweet t = new Tweet(objIn.getJSONObject("user").getString("screen_name"), objIn.getString("text"), null,sentiment);
 		return t;
