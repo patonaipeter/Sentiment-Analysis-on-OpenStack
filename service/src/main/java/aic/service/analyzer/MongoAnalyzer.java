@@ -14,6 +14,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.MapReduceCommand;
 import com.mongodb.Mongo;
 
 public class MongoAnalyzer implements IAnalyzer {
@@ -31,7 +32,7 @@ public class MongoAnalyzer implements IAnalyzer {
 		this.db = mongo.getDB(db);
 		this.tweetsCollection = this.db.getCollection("tweets");
 
-		ClassifierBuilder cb = new ClassifierBuilder();
+		/*ClassifierBuilder cb = new ClassifierBuilder();
 		Options opts = new Options();
 		cb.setOpt(opts);
 		opts.setSelectedFeaturesByFrequency(true);
@@ -53,7 +54,7 @@ public class MongoAnalyzer implements IAnalyzer {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
-		}
+		}*/
 	}
 
 	public double analyze(String company) {
@@ -64,15 +65,13 @@ public class MongoAnalyzer implements IAnalyzer {
 		BasicDBObject dbo = new BasicDBObject();
 		dbo.put("keywords", company.toLowerCase());
 		//dbo.put("text", Pattern.compile(".*"+company+".*"));
-		DBCursor cursor = tweetsCollection.find(dbo);
+		/*DBCursor cursor = tweetsCollection.find(dbo);
 		
 		
 		if(split>1 && index<split && index>=0){
-			/*
-			 * propably very inefficient 
-			 * since for this the whole db
-			 * must be scanned
-			 */
+			//propably very inefficient 
+			//since for this the whole db
+			//must be scanned
 			int count=cursor.count();
 			if(split<count){
 				int limit=count/split;
@@ -89,10 +88,8 @@ public class MongoAnalyzer implements IAnalyzer {
 			DBObject tweet = cursor.next();
 			try {
 				String text = (String) tweet.get("text");
-				/*
-				 * System.out.println("----------------");
-				 * System.out.println(text); System.out.println(r);
-				 */
+				//System.out.println("----------------");
+				//System.out.println(text); System.out.println(r);
 				double r = (Double)tweet.get("sentiment");
 				rating += r;
 				count++;
@@ -101,7 +98,18 @@ public class MongoAnalyzer implements IAnalyzer {
 			}
 		}
 
-		return rating / count;
+		return rating / count;*/
+		
+		//try out map/reduce
+		String map="function(){emit(0,{sentiment: this.sentiment});};";
+		String reduce="function(key,values){" +
+				"var result = 0.0;" +
+			    "values.forEach(function(value) {" +
+			    "  result += value.sentiment;" +
+			    "});" +
+			    "return { sentiment: result/values.length };" +
+				"};";
+		return (Double)tweetsCollection.mapReduce(map, reduce, null,MapReduceCommand.OutputType.INLINE, dbo).results().iterator().next().get("sentiment");
 	}
 
 }
