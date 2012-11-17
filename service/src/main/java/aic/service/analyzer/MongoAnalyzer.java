@@ -63,6 +63,7 @@ public class MongoAnalyzer implements IAnalyzer {
 	public double analyze(String company, int split,int index){
 		BasicDBObject dbo = new BasicDBObject();
 		dbo.put("keywords", company.toLowerCase());
+		//dbo.put("text", Pattern.compile(".*"+company+".*"));
 		DBCursor cursor = tweetsCollection.find(dbo);
 		
 		
