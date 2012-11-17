@@ -35,6 +35,7 @@ public class DataLoader {
 				} catch (JSONException e) {
 
 				}
+				System.out.print("Inserted Tweet Number. " + cnt+"\r");
 			} while (t != null);
 			//add indexes
 			writer.index();
