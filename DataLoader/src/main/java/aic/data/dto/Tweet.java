@@ -6,11 +6,13 @@ public class Tweet {
 	private String username;
 	private String text;
 	private Date timestamp;
+	private double sentiment;
 
-	public Tweet(String username, String text, Date timestamp) {
+	public Tweet(String username, String text, Date timestamp,double sentiment) {
 		this.username = username;
 		this.text = text;
 		this.timestamp = timestamp;
+		this.sentiment = sentiment;
 	}
 
 	public String getUsername() {
@@ -23,5 +25,9 @@ public class Tweet {
 
 	public Date getTimestamp() {
 		return this.timestamp;
+	}
+
+	public double getSentiment() {
+		return sentiment;
 	}
 }
