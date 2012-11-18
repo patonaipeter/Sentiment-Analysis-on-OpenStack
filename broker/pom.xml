@@ -27,7 +27,7 @@
             <configuration>
                 <archive>
                     <manifest>
-                        <mainClass>aic.broker.SimpleBroker</mainClass>
+                        <mainClass>aic.manager.ManagerImpl</mainClass>
                     </manifest>
                 </archive>
                 <descriptorRefs>

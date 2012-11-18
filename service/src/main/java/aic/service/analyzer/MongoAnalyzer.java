@@ -98,7 +98,6 @@ public class MongoAnalyzer implements IAnalyzer {
 				e.printStackTrace();
 			}
 		}
-
 		return rating / count;*/
 		
         //try out map/reduce
