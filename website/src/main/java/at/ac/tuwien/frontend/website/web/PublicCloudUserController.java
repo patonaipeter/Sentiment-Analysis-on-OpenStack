@@ -7,6 +7,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RequestMapping("/public/**")
 @Controller
@@ -20,4 +21,12 @@ public class PublicCloudUserController {
     public String index() {
         return "public/index";
     }
+    
+	@RequestMapping(method = RequestMethod.GET, value="/brokercall")
+	public void updateSentiment(@RequestParam(value = "taskId", required = false) Integer taskId, @RequestParam(value = "sentiment", required = false) Double sentiment ){
+		
+		//TODO update task with id
+		System.out.println("Call Successful with values: taskId: " + taskId + " Sentiment: " + sentiment);
+		
+	}
 }
