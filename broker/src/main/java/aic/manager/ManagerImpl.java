@@ -9,8 +9,15 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class ManagerImpl implements IManager {
+import aic.monitor.IMonitor;
+import aic.monitor.Monitor;
+
+public class ManagerImpl implements IManager, Runnable {
 	private BlockingQueue<TaskDTO> taskQueue=new LinkedBlockingQueue<TaskDTO>();
+	private Thread processingTaskThread;
+	private Thread monitorThread;
+	// mocked
+	private IMonitor monitorObj = new Monitor();
 	
 	@Override
 	public void addSentimentAnalysisTask(TaskDTO task)
@@ -20,6 +27,43 @@ public class ManagerImpl implements IManager {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			throw new RemoteException(e.getMessage());
+		}
+	}
+		
+	public void startProcessTasks(){
+		processingTaskThread = new Thread(this);
+		processingTaskThread.run();
+	}
+	
+	public void startMonitor(){
+		monitorThread = new Thread(monitorObj);
+		monitorThread.run();
+	}
+	
+	private void processTasks() throws InterruptedException, IOException{
+		
+		while(true){
+			TaskDTO task=taskQueue.take();		
+			
+			double result=0.0;
+			/* submit the tasks to mongodb */
+			
+			//return the result to the website (not testet!! change url if necessary)
+            URL url = new URL("http://127.0.0.1:8080/website/postresults/?id="+task.getId()+"&result=" + result);
+            url.openStream().close();
+		}
+	}
+
+	@Override
+	public void run() {
+		try {
+			processTasks();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -40,28 +84,13 @@ public class ManagerImpl implements IManager {
             }
             System.out.println("Manager Service ready on port: " + Registry.REGISTRY_PORT);
             
-            //TODO
-            //open new thread with monitor
+            // start mocked monitor            
+            manager.startMonitor();
             
             //submit the tasks to mongodb
-            manager.processTasks();
+            manager.startProcessTasks();
         } catch (Exception e) {
             e.printStackTrace();
         }
 	}
-	
-	private void processTasks() throws InterruptedException, IOException{
-		
-		while(true){
-			TaskDTO task=taskQueue.take();
-			double result=0.0;
-			
-			/* submit the tasks to mongodb */
-			
-			//return the result to the website (not testet!! change url if necessary)
-            URL url = new URL("http://127.0.0.1:8080/website/postresults/?id="+task.getId()+"&result=" + result);
-            url.openStream().close();
-		}
-	}
-
 }
