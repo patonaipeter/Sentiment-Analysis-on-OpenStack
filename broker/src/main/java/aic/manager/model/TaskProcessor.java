@@ -1,7 +1,6 @@
 package aic.manager.model;
 
 import java.io.IOException;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,6 @@ import aic.manager.interfaces.ITaskProcessor;
 import aic.manager.interfaces.SentimentEventListener;
 import aic.manager.util.SentimentEvent;
 import aic.manager.util.SentimentEventArgs;
-
 import aic.service.analyzer.IAnalyzer;
 
 public class TaskProcessor implements ITaskProcessor {
@@ -31,10 +29,8 @@ public class TaskProcessor implements ITaskProcessor {
 		try {
 			processTasks();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -63,10 +59,32 @@ public class TaskProcessor implements ITaskProcessor {
 	/*
 	 * Notifies listeners about SentimentEvent.
 	 */
-	private void notifySentimentEvent(SentimentEventArgs args) throws IOException {
+	private void notifySentimentEvent(SentimentEventArgs args) {
 		for (SentimentEventListener l : listeners) {
-			l.sentimentEvent(new SentimentEvent(args));
+			try {
+				l.sentimentEvent(new SentimentEvent(args));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+	}
+	
+	/*
+	 * Async wrap method for notifySentimentEvent.
+	 */
+	private void asyncNotifySentimentEvent(final SentimentEventArgs args) {
+		Runnable task = new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                	notifySentimentEvent(args);
+                } catch (Exception ex) {
+                    //handle error which cannot be thrown back
+                }
+            }
+        };
+        new Thread(task).start(); 
 	}
 
 	private void processTasks() throws InterruptedException, IOException {
@@ -76,7 +94,7 @@ public class TaskProcessor implements ITaskProcessor {
 				// compute value
 				double value = this.analyser.analyze(task.getSearch());
 				// notifies about 
-				notifySentimentEvent(new SentimentEventArgs(task.getId(), value));
+				asyncNotifySentimentEvent(new SentimentEventArgs(task.getId(), value));
 			}
 		}
 	}
