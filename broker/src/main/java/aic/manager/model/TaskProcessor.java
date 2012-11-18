@@ -1,6 +1,7 @@
 package aic.manager.model;
 
 import java.io.IOException;
+
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,23 +14,33 @@ import aic.manager.interfaces.SentimentEventListener;
 import aic.manager.util.SentimentEvent;
 import aic.manager.util.SentimentEventArgs;
 
+import aic.service.analyzer.IAnalyzer;
+
 public class TaskProcessor implements ITaskProcessor {
-	private IAnalyser analyser;
+	private IAnalyzer analyser;
 	private BlockingQueue<SentimentTask> taskQueue = null;
 	private List<SentimentEventListener> listeners = new ArrayList<SentimentEventListener>();
 
-	public TaskProcessor(IAnalyser analyser) {
+	public TaskProcessor(IAnalyzer analyser) {
 		this.analyser = analyser;
 		taskQueue = new LinkedBlockingQueue<SentimentTask>();
 	}
 
 	@Override
 	public void run() {
-		processTasks();
+		try {
+			processTasks();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
-	public void addSentimentTask(SentimentTask task) {
+	public void addSentimentTask(SentimentTask task) throws RemoteException {
 		try {
 			taskQueue.put(task);
 		} catch (InterruptedException e) {
@@ -52,7 +63,7 @@ public class TaskProcessor implements ITaskProcessor {
 	/*
 	 * Notifies listeners about SentimentEvent.
 	 */
-	private void notifySentimentEvent(SentimentEventArgs args) {
+	private void notifySentimentEvent(SentimentEventArgs args) throws IOException {
 		for (SentimentEventListener l : listeners) {
 			l.sentimentEvent(new SentimentEvent(args));
 		}
@@ -63,7 +74,7 @@ public class TaskProcessor implements ITaskProcessor {
 			SentimentTask task = taskQueue.take();
 			if (task != null) {
 				// compute value
-				double value = this.analyser.analyse(task.getSearch());
+				double value = this.analyser.analyze(task.getSearch());
 				// notifies about 
 				notifySentimentEvent(new SentimentEventArgs(task.getId(), value));
 			}

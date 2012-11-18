@@ -46,10 +46,11 @@ public class ManagerImpl implements IManager {
 
 	public ManagerImpl() {
 		notifier = (ITaskNotifier) new TaskNotifier();
-		processor = (ITaskProcessor) new TaskProcessor(new MongoAnalyser(host,
-				db));
+		// TODO: Init processor
+//		processor = (ITaskProcessor) new TaskProcessor(new MongoAnalyser(host,
+//				db));
 		monitor = (IMonitor) new Monitor();
-		processor.addEventListener(notifier);
+//		processor.addEventListener(notifier);
 	}
 
 	@Override
