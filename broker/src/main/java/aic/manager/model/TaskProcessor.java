@@ -1,23 +1,19 @@
 package aic.manager.model;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TooManyListenersException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import aic.manager.interfaces.ITaskProcessor;
-import aic.manager.interfaces.SentimentEventListener;
-import aic.manager.util.SentimentEvent;
-import aic.manager.util.SentimentEventArgs;
 import aic.service.analyzer.IAnalyzer;
 
 public class TaskProcessor implements ITaskProcessor {
 	private IAnalyzer analyser;
-	private BlockingQueue<SentimentTask> taskQueue = null;
-	private List<SentimentEventListener> listeners = new ArrayList<SentimentEventListener>();
+	private BlockingQueue<SentimentTask> taskQueue = null;	
+	private String subscriber;
 
 	public TaskProcessor(IAnalyzer analyser) {
 		this.analyser = analyser;
@@ -45,40 +41,35 @@ public class TaskProcessor implements ITaskProcessor {
 		}
 	}
 
-	@Override
-	public void addEventListener(SentimentEventListener arg0)
-			throws TooManyListenersException {
-		listeners.add(arg0);
-	}
-
-	@Override
-	public void removeEventListeners() {
-		listeners.clear();
-	}
-
 	/*
 	 * Notifies listeners about SentimentEvent.
 	 */
-	private void notifySentimentEvent(SentimentEventArgs args) {
-		for (SentimentEventListener l : listeners) {
-			try {
-				l.sentimentEvent(new SentimentEvent(args));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	private void notifySentimentEvent(int id, double service) {
+		URL url;
+		try {
+			// return the result to the website (not test!! change url
+			// if
+			// necessary)
+			url = new URL(String.format("%s?id=%d&result=%f",
+					subscriber, id, service));
+			url.openStream().close();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
 	/*
 	 * Async wrap method for notifySentimentEvent.
 	 */
-	private void asyncNotifySentimentEvent(final SentimentEventArgs args) {
+	private void asyncNotifySentimentEvent(final int id, final double service) {
 		Runnable task = new Runnable() {
 
             @Override
             public void run() {
                 try {
-                	notifySentimentEvent(args);
+                	notifySentimentEvent(id, service);
                 } catch (Exception ex) {
                     //handle error which cannot be thrown back
                 }
@@ -94,9 +85,14 @@ public class TaskProcessor implements ITaskProcessor {
 				// compute value
 				double value = this.analyser.analyze(task.getSearch());
 				// notifies about 
-				asyncNotifySentimentEvent(new SentimentEventArgs(task.getId(), value));
+				asyncNotifySentimentEvent(task.getId(), value);
 			}
 		}
+	}
+
+	@Override
+	public void changeSubscriber(String serviceUrl) {
+		this.subscriber = serviceUrl;		
 	}
 
 }

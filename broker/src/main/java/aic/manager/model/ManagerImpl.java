@@ -8,7 +8,6 @@ import java.rmi.server.UnicastRemoteObject;
 
 import aic.manager.interfaces.IManager;
 import aic.manager.interfaces.IMonitor;
-import aic.manager.interfaces.ITaskNotifier;
 import aic.manager.interfaces.ITaskProcessor;
 
 public class ManagerImpl implements IManager {
@@ -40,17 +39,14 @@ public class ManagerImpl implements IManager {
 		}
 	}
 
-	private ITaskNotifier notifier;
 	private ITaskProcessor processor;
 	private IMonitor monitor;
 
 	public ManagerImpl() {
-		notifier = (ITaskNotifier) new TaskNotifier();
 		// TODO: Init processor
 //		processor = (ITaskProcessor) new TaskProcessor(new MongoAnalyser(host,
 //				db));
 		monitor = (IMonitor) new Monitor();
-//		processor.addEventListener(notifier);
 	}
 
 	@Override
@@ -60,13 +56,8 @@ public class ManagerImpl implements IManager {
 	}
 
 	@Override
-	public void subscribe(String name) {
-		notifier.addSubscriber(name);
-	}
-
-	@Override
-	public void unsubscribe(String name) {
-		notifier.removeSubscriber(name);
+	public void subscribe(String serviceUrl) {
+		processor.changeSubscriber(serviceUrl);
 	}
 
 	/*
