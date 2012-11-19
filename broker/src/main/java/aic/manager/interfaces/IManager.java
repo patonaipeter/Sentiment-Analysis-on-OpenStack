@@ -10,5 +10,5 @@ public interface IManager extends Remote {
 	void addSentimentAnalysisTask(SentimentTask task) throws RemoteException;
 
 	// add new subscriber
-	void subscribe(String serviceUrl);
+	void subscribe(String serviceUrl) throws RemoteException;
 }

@@ -26,6 +26,7 @@ public class ManagerImpl implements IManager {
 				registry.rebind(name, stub);
 			} catch (RemoteException e) {
 				// create new registry
+				
 				registry = LocateRegistry
 						.createRegistry(Registry.REGISTRY_PORT);
 				registry.rebind(name, stub);

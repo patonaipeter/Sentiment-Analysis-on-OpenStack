@@ -1,7 +1,6 @@
 package aic.manager.interfaces;
 
 import java.rmi.RemoteException;
-import java.util.TooManyListenersException;
 
 import aic.manager.model.SentimentTask;
 

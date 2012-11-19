@@ -19,7 +19,7 @@
        <artifactId>exec-maven-plugin</artifactId>
        <version>1.1</version>
        <configuration>
-         <mainClass>aic.broker.SimpleBroker</mainClass>
+         <mainClass>aic.manager.model.ManagerImpl</mainClass>
        </configuration>
      </plugin>
         <plugin>
@@ -27,7 +27,7 @@
             <configuration>
                 <archive>
                     <manifest>
-                        <mainClass>aic.manager.ManagerImpl</mainClass>
+                        <mainClass>aic.manager.model.ManagerImpl</mainClass>
                     </manifest>
                 </archive>
                 <descriptorRefs>
