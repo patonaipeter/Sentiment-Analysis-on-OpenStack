@@ -1,5 +1,7 @@
 package openstack_examples;
 
+import java.util.Calendar;
+
 import org.openstack.keystone.KeystoneClient;
 import org.openstack.keystone.api.Authenticate;
 import org.openstack.keystone.api.ListTenants;
@@ -32,6 +34,8 @@ public class LaunchMonitor {
 	private static final String KEY_NAME = "aic12";
 
 	private static final String SECURITY_GROUP_NAME = "default";
+
+	private Access serverAccess = null;
 
 	public Server createServer(String serverName, String flavorRef,
 			String imgRef) {
@@ -85,41 +89,49 @@ public class LaunchMonitor {
 		return null;
 	}
 
+	private Boolean isTokenExpired() {
+		return Calendar.getInstance().getTime()
+				.compareTo(serverAccess.getToken().getExpires().getTime()) == 1;
+	}
+
 	private NovaClient getNovaClient() {
-		KeystoneClient keystone = new KeystoneClient(KEYSTONE_AUTH_URL);
-		Authentication authentication = new Authentication();
-		PasswordCredentials passwordCredentials = new PasswordCredentials();
-		passwordCredentials.setUsername(KEYSTONE_USERNAME);
-		passwordCredentials.setPassword(KEYSTONE_PASSWORD);
-		authentication.setPasswordCredentials(passwordCredentials);
+		if (serverAccess == null || isTokenExpired()) {
+			KeystoneClient keystone = new KeystoneClient(KEYSTONE_AUTH_URL);
+			Authentication authentication = new Authentication();
+			PasswordCredentials passwordCredentials = new PasswordCredentials();
+			passwordCredentials.setUsername(KEYSTONE_USERNAME);
+			passwordCredentials.setPassword(KEYSTONE_PASSWORD);
+			authentication.setPasswordCredentials(passwordCredentials);
 
-		// access with unscoped token
-		Access access = keystone.execute(new Authenticate(authentication));
+			// access with unscoped token
+			serverAccess = keystone.execute(new Authenticate(authentication));
 
-		// use the token in the following requests
-		keystone.setToken(access.getToken().getId());
+			// use the token in the following requests
+			keystone.setToken(serverAccess.getToken().getId());
 
-		Tenants tenants = keystone.execute(new ListTenants());
+			Tenants tenants = keystone.execute(new ListTenants());
 
-		// try to exchange token using the first tenant
-		if (tenants.getList().size() > 0) {
+			// try to exchange token using the first tenant
+			if (tenants.getList().size() > 0) {
 
-			authentication = new Authentication();
-			Token token = new Token();
-			token.setId(access.getToken().getId());
-			authentication.setToken(token);
-			authentication.setTenantId(tenants.getList().get(0).getId());
+				authentication = new Authentication();
+				Token token = new Token();
+				token.setId(serverAccess.getToken().getId());
+				authentication.setToken(token);
+				authentication.setTenantId(tenants.getList().get(0).getId());
 
-			access = keystone.execute(new Authenticate(authentication));
+				serverAccess = keystone
+						.execute(new Authenticate(authentication));
 
-			return new NovaClient(KeystoneUtils.findEndpointURL(
-					access.getServiceCatalog(), "compute", null, "public"),
-					access.getToken().getId());
-		} else {
-			System.out.println("No tenants found!");
+			} else {
+				System.out.println("No tenants found!");
+				return null;
+			}
 		}
 
-		return null;
+		return new NovaClient(KeystoneUtils.findEndpointURL(
+				serverAccess.getServiceCatalog(), "compute", null, "public"),
+				serverAccess.getToken().getId());
 	}
 
 	/**
