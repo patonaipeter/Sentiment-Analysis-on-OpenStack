@@ -18,9 +18,9 @@ public class NovaListImages {
 
 	private static final String KEYSTONE_AUTH_URL = "http://openstack.infosys.tuwien.ac.at:5000/v2.0";
 
-	private static final String KEYSTONE_USERNAME = "aic12w04";
+	private static final String KEYSTONE_USERNAME = "login";
 
-	private static final String KEYSTONE_PASSWORD = "Sah9meec";
+	private static final String KEYSTONE_PASSWORD = "password";
 
 	/**
 	 * @param args
