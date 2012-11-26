@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:list id="pl_aic_website_domain_AuthUser" items="${authusers}" z="vWNon2IO6ATW+7uyT7NLYfsHNuU=">
+        <table:table data="${authusers}" id="l_aic_website_domain_AuthUser" path="/authusers" z="gMvQkI84HeqDN+x9jKvu5E067aA=">
+            <table:column id="c_aic_website_domain_AuthUser_name" property="name" z="kJoD2FmxJ8VUbfMZinu7BaNi/jU="/>
+            <table:column id="c_aic_website_domain_AuthUser_password" property="password" z="user-managed" render="false"/>
+            <table:column id="c_aic_website_domain_AuthUser_enabled" property="enabled" z="z2kYdNb75xn/kiv1+qflU0vk2sg="/>
+            <table:column id="c_aic_website_domain_AuthUser_roles" property="roles" z="5M3xHwfc7XrLDAlM8aCDfCe68N8="/>
+            <table:column id="c_aic_website_domain_AuthUser_tasks" property="tasks" z="user-managed" render="false"/>
+        </table:table>
+    </page:list>
+</div>

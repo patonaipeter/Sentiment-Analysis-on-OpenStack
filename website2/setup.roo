@@ -1,0 +1,20 @@
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 14:50:08
+project --topLevelPackage aic.website
+jpa setup --database HYPERSONIC_PERSISTENT --provider HIBERNATE 
+entity jpa --class ~.domain.AuthRole
+field string --fieldName name --notNull --sizeMax 50
+entity jpa --class ~.domain.AuthUser
+field string --fieldName name --notNull --sizeMin 3 --sizeMax 30
+field string --fieldName password --sizeMax 50
+field boolean --fieldName enabled --notNull true
+field set --fieldName roles --type ~.domain.AuthRole --cardinality MANY_TO_MANY 
+entity jpa --class ~.domain.Task
+
+field set --fieldName tasks --class AuthUser --type Task --mappedBy owner
+field reference --fieldName owner --class Task --type AuthUser --notNull
+field string --fieldName name --notNull 
+field string --fieldName description
+field string --fieldName searchTerm --permitReservedWords 
+field number --type double --fieldName analysisResult --permitReservedWords 
+web mvc all --package aic.website.web
+

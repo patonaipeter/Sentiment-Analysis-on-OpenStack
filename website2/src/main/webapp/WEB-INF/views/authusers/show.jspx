@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:show id="ps_aic_website_domain_AuthUser" object="${authuser}" path="/authusers" z="h6bhDQ1qEHpnSW/HA50PcF8GBZc=">
+        <field:display field="name" id="s_aic_website_domain_AuthUser_name" object="${authuser}" z="2uoLKaLRpnxZKxPakmW/wkCQ/yE="/>
+        <field:display field="password" id="s_aic_website_domain_AuthUser_password" object="${authuser}" z="user-managed" render="false"/> 
+        <field:display field="enabled" id="s_aic_website_domain_AuthUser_enabled" object="${authuser}" z="Xw/+8jzsR99sriRhgIUKPh5zvU8="/>
+        <field:display field="roles" id="s_aic_website_domain_AuthUser_roles" object="${authuser}" z="0wYOfP+EqtoVxpREepdsane/PMY="/>
+        <field:display field="tasks" id="s_aic_website_domain_AuthUser_tasks" object="${authuser}" z="user-managed" render="false"/>
+    </page:show>
+</div>

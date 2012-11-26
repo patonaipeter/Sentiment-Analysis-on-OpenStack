@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <form:update id="fu_aic_website_domain_Task" modelAttribute="task" path="/tasks" versionField="Version" z="6E3DDKycL06sb3qQzvOo1yq6p0Y=">
+        <field:select field="owner" id="c_aic_website_domain_Task_owner" itemValue="id" items="${authusers}" path="/authusers" render="false" required="true" z="user-managed"/>
+        <field:input field="name" id="c_aic_website_domain_Task_name" required="true" z="qJWxMt2U1YlBs3TgPxsjLaCmAGI="/>
+        <field:input field="description" id="c_aic_website_domain_Task_description" z="KfDnOVrN5k+B0vH+ns4eV3AUrCM="/>
+        <field:input field="searchTerm" id="c_aic_website_domain_Task_searchTerm" min="3" required="true" z="kpqTJkGFTqgrevvxmEboYK2jt+c="/>
+        <field:input field="analysisResult" id="c_aic_website_domain_Task_analysisResult" render="false" z="user-managed"/>
+    </form:update>
+</div>

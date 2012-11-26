@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:list id="pl_aic_website_domain_Task" items="${tasks}" z="zLIiI5yvLq4Di7lXaJi6B0q7w7I=">
+        <table:table data="${tasks}" id="l_aic_website_domain_Task" path="/tasks" z="36TTAnUI0qVclvooPX7Tg+kv4cs=">
+            <table:column id="c_aic_website_domain_Task_owner" property="owner" render="false" z="user-managed"/>
+            <table:column id="c_aic_website_domain_Task_name" property="name" z="39hP5/RdJENtJfnujSvtVdXZZbI="/>
+            <table:column id="c_aic_website_domain_Task_description" property="description" z="9v5W4I7tFktjq5EsbYrniqUTfo4="/>
+            <table:column id="c_aic_website_domain_Task_searchTerm" property="searchTerm" z="oOk//104bwavNGW6SHieEUwMzTc="/>
+            <table:column id="c_aic_website_domain_Task_analysisResult" property="analysisResult" z="y2sNLem1G9T2ktmU8f7SMqkSzRM="/>
+        </table:table>
+    </page:list>
+</div>

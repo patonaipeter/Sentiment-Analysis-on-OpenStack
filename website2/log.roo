@@ -1,0 +1,76 @@
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 15:26:44
+project --topLevelPackage aic.website
+jpa setup --database HYPERSONIC_PERSISTENT --provider HIBERNATE 
+entity jpa --class ~.domain.AuthRole
+field string --fieldName name --notNull --sizeMax 50
+entity jpa --class ~.domain.AuthUser
+field string --fieldName name --notNull --sizeMin 3 --sizeMax 30
+field string --fieldName password --sizeMax 50
+field boolean --fieldName enabled --notNull true
+field set --fieldName roles --type ~.domain.AuthRole --cardinality MANY_TO_MANY 
+entity jpa --class ~.domain.Task
+field set --fieldName tasks --class AuthUser --type Task --mappedBy owner
+field reference --fieldName owner --class Task --type AuthUser --notNull
+field string --fieldName name --notNull 
+field string --fieldName description
+field string --fieldName searchTerm --permitReservedWords 
+field number --type double --fieldName analysisResult --permitReservedWords 
+// [failed] script setup.roo
+web mvc setup
+web mvc all --package aic.website.web
+security setup
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 15:35:58
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 16:45:12
+hint
+hint eclipse
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 16:48:29
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 17:11:12
+perform eclipse
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 17:25:11
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 17:56:04
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 17:56:49
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 18:06:47
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 18:07:13
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 18:25:09
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 18:26:12
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 18:58:17
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 18:59:11
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 19:05:43
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 19:06:13
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 19:07:43
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 19:08:30
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 22:59:13
+// [failed] finder list --class AuthUser
+finder list --class ~.domain.AuthUser
+finder add --finderName findAuthUsersByNameEquals
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 23:01:08
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 23:04:28
+finder list --class ~.domain.AuthUser
+field string --fieldName searchTerm2 --class ~.domain.Task --unique --notNull  --permitReservedWords 
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 23:06:18
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 23:07:21
+finder list --class ~.domain.AuthUser
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 23:16:52
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 23:17:18
+finder list --class ~.domain.Task
+finder add --finderName findTasksByOwner
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 23:18:47
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 23:40:40
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 23:41:09
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 23:41:57
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 23:42:27

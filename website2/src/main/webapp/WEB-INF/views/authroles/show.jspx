@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:show id="ps_aic_website_domain_AuthRole" object="${authrole}" path="/authroles" z="mBi1w8R2nBdl4IIZNzO7h9xWQEg=">
+        <field:display field="name" id="s_aic_website_domain_AuthRole_name" object="${authrole}" z="m17Kdby0TulQITVEtVUr/HDG+a0="/>
+    </page:show>
+</div>
