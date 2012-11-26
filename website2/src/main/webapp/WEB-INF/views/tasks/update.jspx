@@ -8,5 +8,6 @@
         <field:input field="description" id="c_aic_website_domain_Task_description" z="KfDnOVrN5k+B0vH+ns4eV3AUrCM="/>
         <field:input field="searchTerm" id="c_aic_website_domain_Task_searchTerm" min="3" required="true" z="kpqTJkGFTqgrevvxmEboYK2jt+c="/>
         <field:input field="analysisResult" id="c_aic_website_domain_Task_analysisResult" render="false" z="user-managed"/>
+        <field:input field="runtime" id="c_aic_website_domain_Task_runtime" render="false" z="user-managed"/>
     </form:update>
 </div>

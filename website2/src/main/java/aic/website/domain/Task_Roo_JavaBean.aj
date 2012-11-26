@@ -5,6 +5,7 @@ package aic.website.domain;
 
 import aic.website.domain.AuthUser;
 import aic.website.domain.Task;
+import java.util.Date;
 
 privileged aspect Task_Roo_JavaBean {
     
@@ -46,6 +47,22 @@ privileged aspect Task_Roo_JavaBean {
     
     public void Task.setAnalysisResult(double analysisResult) {
         this.analysisResult = analysisResult;
+    }
+    
+    public Date Task.getCreated() {
+        return this.created;
+    }
+    
+    public void Task.setCreated(Date created) {
+        this.created = created;
+    }
+    
+    public long Task.getRuntime() {
+        return this.runtime;
+    }
+    
+    public void Task.setRuntime(long runtime) {
+        this.runtime = runtime;
     }
     
 }

@@ -41,7 +41,11 @@ public class TaskController {
 		}
 		
 		task.setOwner(getCurrentUser());
+		
+		long startTime = System.currentTimeMillis();
 		task.setAnalysisResult(sentimentService.analyseSentiment(task.getSearchTerm()));
+		long endTime   = System.currentTimeMillis();
+		task.setRuntime(endTime - startTime);
 		
         uiModel.asMap().clear();
         task.persist();
@@ -97,11 +101,23 @@ public class TaskController {
     public String update(@Valid Task task, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
 		if(task.getName()==null || task.getSearchTerm()==null || task.getSearchTerm().length()<3){
             populateEditForm(uiModel, task);
-            return "tasks/create";
+            return "tasks/update";
 		}
 		
 		task.setOwner(getCurrentUser());
-		task.setAnalysisResult(sentimentService.analyseSentiment(task.getSearchTerm()));
+		
+		Task old=Task.findTask(task.getId());
+		task.setCreated(old.getCreated());
+		
+		if(!old.getSearchTerm().equals(task.getSearchTerm())){
+			long startTime = System.currentTimeMillis();
+			task.setAnalysisResult(sentimentService.analyseSentiment(task.getSearchTerm()));
+			long endTime   = System.currentTimeMillis();
+			task.setRuntime(endTime - startTime);
+		}else{
+			task.setAnalysisResult(old.getAnalysisResult());
+			task.setRuntime(old.getRuntime());
+		}
 		
         uiModel.asMap().clear();
         task.merge();

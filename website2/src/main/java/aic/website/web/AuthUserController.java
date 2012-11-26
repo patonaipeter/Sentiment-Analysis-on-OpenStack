@@ -45,8 +45,11 @@ public class AuthUserController {
         }
         uiModel.asMap().clear();
         String password=authUser.getPassword();
-        if(password!=null){
+        if(password!=null && password.length()>0){
         	authUser.setPassword(calcHash(password));
+        }else{
+        	AuthUser old=AuthUser.findAuthUser(authUser.getId());
+        	authUser.setPassword(old.getPassword());
         }
         authUser.merge();
         return "redirect:/authusers/" + encodeUrlPathSegment(authUser.getId().toString(), httpServletRequest);

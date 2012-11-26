@@ -74,3 +74,14 @@ exit
 // Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-25 23:41:57
 exit
 // Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-25 23:42:27
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-26 09:23:01
+field date --class ~.domain.Task --fieldName created --type java.util.Date
+field number --class ~.domain.Task --fieldName runtime --type long
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-26 09:25:27
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-26 09:30:47
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-26 09:34:53
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-26 09:35:11
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-26 09:35:53

@@ -8,5 +8,6 @@
         <field:display field="description" id="s_aic_website_domain_Task_description" object="${task}" z="XJB9mslCnPXA/n2i0TseLRkb7XM="/>
         <field:display field="searchTerm" id="s_aic_website_domain_Task_searchTerm" object="${task}" z="PQFt0JEmGyBjjeH8rAoJe3nLPiM="/>
         <field:display field="analysisResult" id="s_aic_website_domain_Task_analysisResult" object="${task}" z="eocDjS/vnTPE2hNgaUg5tpRn6tM="/>
+        <field:display field="runtime" id="s_aic_website_domain_Task_runtime" object="${task}" z="MZWIr+F3KFoTrms+a3tJ6fttUFM="/>
     </page:show>
 </div>

@@ -9,6 +9,8 @@
             <table:column id="c_aic_website_domain_Task_description" property="description" z="9v5W4I7tFktjq5EsbYrniqUTfo4="/>
             <table:column id="c_aic_website_domain_Task_searchTerm" property="searchTerm" z="oOk//104bwavNGW6SHieEUwMzTc="/>
             <table:column id="c_aic_website_domain_Task_analysisResult" property="analysisResult" z="y2sNLem1G9T2ktmU8f7SMqkSzRM="/>
+            <table:column date="true" dateTimePattern="${task_created_date_format}" id="c_aic_website_domain_Task_created" property="created" z="I0xJ6JPT0ht5KRQrP5Yn978OFDg="/>
+            <table:column id="c_aic_website_domain_Task_runtime" property="runtime" z="MZWIr+F3KFoTrms+a3tJ6fttUFM="/>
         </table:table>
     </page:list>
 </div>
