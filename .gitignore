@@ -4,4 +4,4 @@
 .settings/
 .metadata/
 target/
-bin/
+broker/properties.xml

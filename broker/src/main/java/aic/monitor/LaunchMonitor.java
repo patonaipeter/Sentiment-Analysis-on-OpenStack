@@ -1,6 +1,8 @@
-package openstack_examples;
+package aic.monitor;
 
+import java.io.FileInputStream;
 import java.util.Calendar;
+import java.util.Properties;
 
 import org.openstack.keystone.KeystoneClient;
 import org.openstack.keystone.api.Authenticate;
@@ -25,17 +27,32 @@ import org.openstack.nova.model.Servers;
 
 public class LaunchMonitor {
 
-	private static final String KEYSTONE_AUTH_URL = "http://openstack.infosys.tuwien.ac.at:5000/v2.0";
-
-	private static final String KEYSTONE_USERNAME = "login";
-
-	private static final String KEYSTONE_PASSWORD = "pass";
-
-	private static final String KEY_NAME = "aic12";
-
-	private static final String SECURITY_GROUP_NAME = "default";
-
+	private String KEYSTONE_AUTH_URL;
+	private String KEYSTONE_USERNAME;
+	private String KEYSTONE_PASSWORD;
+	private String KEY_NAME;
+	private String SECURITY_GROUP_NAME;
 	private Access serverAccess = null;
+	
+	public LaunchMonitor(Properties p){
+		this.KEYSTONE_AUTH_URL = p.getProperty("openstack_url");
+		this.KEYSTONE_USERNAME = p.getProperty("openstack_username");
+		this.KEYSTONE_PASSWORD = p.getProperty("openstack_password");
+		this.KEY_NAME = p.getProperty("openstack_key");
+		this.SECURITY_GROUP_NAME = p.getProperty("openstack_security_group");
+	}
+	
+	public LaunchMonitor(String url,
+			String username,
+			String password,
+			String key,
+			String security_group){
+		this.KEYSTONE_AUTH_URL = url;
+		this.KEYSTONE_USERNAME = username;
+		this.KEYSTONE_PASSWORD = password;
+		this.KEY_NAME = key;
+		this.SECURITY_GROUP_NAME = security_group;
+	}
 
 	public Server createServer(String serverName, String flavorRef,
 			String imgRef) {
@@ -74,8 +91,7 @@ public class LaunchMonitor {
 	}
 
 	/**
-	 * @param id
-	 *            Server id
+	 * @param id Server id
 	 * @return Returns Server with @id, if it exists. Otherwise null.
 	 */
 	public Server getServer(String id) {
@@ -138,22 +154,29 @@ public class LaunchMonitor {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		Properties properties = new Properties();
+		try {
+			properties.loadFromXML(new FileInputStream("properties.xml"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		
 		// TODO Auto-generated method stub
-		LaunchMonitor monitor = new LaunchMonitor();
+		LaunchMonitor monitor = new LaunchMonitor(properties);
 
 		String flavorRef = null;
 		String imgRef = null;
 
 		// print all flavors
 		for (Flavor flavor : monitor.getFlavors()) {
-			if (flavor.getName().equals("m1.tiny"))
+			if (flavor.getName().equals("m1.tiny.win"))
 				flavorRef = flavor.getLinks().get(0).getHref();
 			System.out.println(flavor);
 		}
 
 		// print all images
 		for (Image image : monitor.getImages()) {
-			if (image.getName().equals("mongo-fresh")) {
+			if (image.getName().equals("Ubuntu 12.10 amd64")) {
 				imgRef = image.getLinks().get(0).getHref();
 			}
 			System.out.println(image);
