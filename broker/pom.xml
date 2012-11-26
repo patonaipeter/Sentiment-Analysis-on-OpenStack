@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>aic.broker</groupId>
   <artifactId>broker</artifactId>
-  <version>0.1</version>
+  <version>0.2</version>
   
    <build>
    <plugins>
@@ -19,7 +19,7 @@
        <artifactId>exec-maven-plugin</artifactId>
        <version>1.1</version>
        <configuration>
-         <mainClass>aic.manager.model.ManagerImpl</mainClass>
+         <mainClass>aic.monitor.BaseMonitor</mainClass>
        </configuration>
      </plugin>
         <plugin>
@@ -27,7 +27,7 @@
             <configuration>
                 <archive>
                     <manifest>
-                        <mainClass>aic.manager.model.ManagerImpl</mainClass>
+                        <mainClass>aic.monitor.BaseMonitor</mainClass>
                     </manifest>
                 </archive>
                 <descriptorRefs>
@@ -40,8 +40,8 @@
    <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-   <dependencies>
-   	<dependency>
+  <dependencies>
+  	<dependency>
   		<groupId>org.openstack</groupId>
   		<artifactId>keystone-client</artifactId>
   		<version>2.0.0-SNAPSHOT</version>
@@ -51,5 +51,5 @@
   		<artifactId>nova-client</artifactId>
   		<version>2.0.0-SNAPSHOT</version>
   	</dependency>
-   </dependencies>
+  </dependencies>
 </project>
