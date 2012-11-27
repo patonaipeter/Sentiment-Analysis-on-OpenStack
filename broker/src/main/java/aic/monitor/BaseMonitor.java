@@ -1,6 +1,6 @@
 package aic.monitor;
 
-import aic.monitor.properties.PropertyManager;
+import aic.monitor.util.PropertyManager;
 
 public class BaseMonitor {
 	private int sleepTime = 5000;

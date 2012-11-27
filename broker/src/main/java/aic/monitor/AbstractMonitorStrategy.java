@@ -1,6 +1,6 @@
 package aic.monitor;
 
-import aic.monitor.properties.PropertyManager;
+import aic.monitor.util.PropertyManager;
 
 public abstract class AbstractMonitorStrategy {
 	protected LaunchMonitor launchMonitor;
@@ -9,7 +9,7 @@ public abstract class AbstractMonitorStrategy {
 	protected AbstractMonitorStrategy() {
 		initMonitors();
 	}
-	
+
 	private void initMonitors(){
 		LaunchMonitor launchMonitor = new LaunchMonitor(PropertyManager
 				.getInstance().getProperties());
