@@ -31,7 +31,7 @@ public class LaunchMonitor {
 	private String SECURITY_GROUP_NAME;
 	private Access serverAccess = null;
 
-	public LaunchMonitor(Properties p){
+	public LaunchMonitor(Properties p) {
 		this.KEYSTONE_AUTH_URL = p.getProperty("openstack_url");
 		this.KEYSTONE_USERNAME = p.getProperty("openstack_username");
 		this.KEYSTONE_PASSWORD = p.getProperty("openstack_password");
@@ -142,9 +142,8 @@ public class LaunchMonitor {
 			}
 		}
 
-		return new NovaClient(KeystoneUtils.findEndpointURL(
-				serverAccess.getServiceCatalog(), "compute", null, "public"),
-				serverAccess.getToken().getId());
+		return new NovaClient(KeystoneUtils.findEndpointURL(serverAccess.getServiceCatalog(), "compute", null, "public"),
+							  serverAccess.getToken().getId());
 	}
 
 

@@ -1,6 +1,5 @@
 package aic.monitor.ui;
 
-import java.io.FileInputStream;
 import java.util.Properties;
 
 import org.openstack.nova.model.Flavor;
@@ -22,7 +21,7 @@ public class StartUpMonitor {
 	public static void main(String[] args) {
 		Properties properties = new Properties();
 		try {
-			properties.loadFromXML(new FileInputStream("properties.xml"));
+			properties.loadFromXML(ClassLoader.getSystemResourceAsStream("properties.xml"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

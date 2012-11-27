@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="broker" default="run-monitor" basedir=".">
+    <description>
+        A simple openstack monitor
+    </description>
+
+    <!-- set global properties for this build -->
+    <property name="src.dir" location="src/main/java"/>
+    <property name="build.dir" location="target/classes"/>
+    <property name="resources.dir" location="src/main/resources/"/>
+	<property name="lib.dir" location="lib/"/>
+
+    <!--<property name="lib.dir" location="lib" />-->
+
+    <path id="project.classpath">
+        <fileset dir="${lib.dir}">
+            <include name="keystone-client-2.0.0-SNAPSHOT.jar"/>
+        	<include name="nova-client-2.0.0-SNAPSHOT.jar"/>
+        </fileset>
+        <pathelement location="${build.dir}"/>
+        <pathelement location="${resources.dir}"/>
+    </path>
+
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+    </target>
+
+    <target name="run-monitor" description="run the monitor" >
+        <java classname="aic.monitor.ui.StartUpMonitor"
+            classpathref="project.classpath"
+            fork="true"
+        />
+    </target>
+
+</project>
