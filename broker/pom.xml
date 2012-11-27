@@ -20,7 +20,7 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.1</version>
 				<configuration>
-					<mainClass>aic.monitor.BaseMonitor</mainClass>
+					<mainClass>aic.monitor.ui.StartUpMonitor</mainClass>
 				</configuration>
 			</plugin>
 			<plugin>
