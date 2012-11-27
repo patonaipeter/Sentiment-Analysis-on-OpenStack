@@ -56,7 +56,7 @@ public class SSHMonitor {
 	}
 
 	public void restartMongoDb() throws IOException {
-		// to install mpstat: sudo apt-get install sysstat
+		// to install mpstat: sudo apt-get install sysstat 
 		output.write("sudo /etc/init.d/mongodb restart\n");
 		output.flush();
 		// skip the rest
