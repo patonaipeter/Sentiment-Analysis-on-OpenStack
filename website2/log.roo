@@ -85,3 +85,17 @@ exit
 // Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-26 09:35:11
 exit
 // Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-26 09:35:53
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-27 12:14:25
+finder list --class ~.domain.AuthRole
+finder add --finderName findAuthRolesByNameEquals
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-27 12:15:48
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-27 13:01:38
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-27 13:03:28
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-27 13:05:36
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-27 13:06:42
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log opened at 2012-11-27 13:57:44
+exit
+// Spring Roo 1.2.2.RELEASE [rev 7d75659] log closed at 2012-11-27 13:58:26

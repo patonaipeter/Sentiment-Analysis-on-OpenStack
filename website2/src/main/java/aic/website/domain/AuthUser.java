@@ -25,9 +25,9 @@ public class AuthUser {
     private String password;
 
     @NotNull
-    private Boolean enabled;
+    private Boolean enabled = true;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = { CascadeType.REFRESH, CascadeType.DETACH})
     private Set<AuthRole> roles = new HashSet<AuthRole>();
 
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "owner")

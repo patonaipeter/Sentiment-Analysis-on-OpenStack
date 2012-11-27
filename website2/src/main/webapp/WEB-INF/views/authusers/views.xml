@@ -13,4 +13,7 @@
 <definition extends="default" name="authusers/update">
         <put-attribute name="body" value="/WEB-INF/views/authusers/update.jspx"/>
     </definition>
+ <definition extends="default" name="authusers/register">
+        <put-attribute name="body" value="/WEB-INF/views/authusers/register.jspx"/>
+    </definition>
 </tiles-definitions>

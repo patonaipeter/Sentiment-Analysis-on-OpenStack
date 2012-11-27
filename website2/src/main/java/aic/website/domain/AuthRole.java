@@ -9,11 +9,11 @@ import org.springframework.roo.addon.tostring.RooToString;
 
 @RooJavaBean
 @RooToString
-@RooJpaActiveRecord
+@RooJpaActiveRecord(finders = { "findAuthRolesByNameEquals" })
 public class AuthRole {
 
     @NotNull
-    @Column(unique=true)
+    @Column(unique = true)
     @Size(max = 30)
     private String name;
 }

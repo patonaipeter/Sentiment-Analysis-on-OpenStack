@@ -3,13 +3,19 @@
 
 package aic.website.web;
 
+import aic.website.domain.AuthRole;
 import aic.website.domain.AuthUser;
+import aic.website.domain.Task;
 import aic.website.web.AuthUserController;
+import java.io.UnsupportedEncodingException;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.UriUtils;
+import org.springframework.web.util.WebUtils;
 
 privileged aspect AuthUserController_Roo_Controller {
     
@@ -54,6 +60,23 @@ privileged aspect AuthUserController_Roo_Controller {
         uiModel.addAttribute("page", (page == null) ? "1" : page.toString());
         uiModel.addAttribute("size", (size == null) ? "10" : size.toString());
         return "redirect:/authusers";
+    }
+    
+    void AuthUserController.populateEditForm(Model uiModel, AuthUser authUser) {
+        uiModel.addAttribute("authUser", authUser);
+        uiModel.addAttribute("authroles", AuthRole.findAllAuthRoles());
+        uiModel.addAttribute("tasks", Task.findAllTasks());
+    }
+    
+    String AuthUserController.encodeUrlPathSegment(String pathSegment, HttpServletRequest httpServletRequest) {
+        String enc = httpServletRequest.getCharacterEncoding();
+        if (enc == null) {
+            enc = WebUtils.DEFAULT_CHARACTER_ENCODING;
+        }
+        try {
+            pathSegment = UriUtils.encodePathSegment(pathSegment, enc);
+        } catch (UnsupportedEncodingException uee) {}
+        return pathSegment;
     }
     
 }

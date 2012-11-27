@@ -2,8 +2,6 @@ package aic.website.web;
 
 import aic.website.domain.AuthRole;
 import aic.website.domain.AuthUser;
-import aic.website.domain.Task;
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -15,14 +13,41 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.util.UriUtils;
-import org.springframework.web.util.WebUtils;
 
 @RequestMapping("/authusers")
 @Controller
 @RooWebScaffold(path = "authusers", formBackingObject = AuthUser.class)
 public class AuthUserController {
-
+    
+    @RequestMapping(params = "register", produces = "text/html")
+    public String createRegisterForm(Model uiModel) {
+        populateEditForm(uiModel, new AuthUser());
+        return "authusers/register";
+    }
+    
+	@RequestMapping(params = "register",method = RequestMethod.POST, produces = "text/html")
+    public String createRegister(@Valid AuthUser authUser, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) throws NoSuchAlgorithmException {
+		if (authUser.getName() == null || authUser.getName().length() < 3
+				|| authUser.getPassword() == null
+				|| authUser.getPassword().length() < 3) {
+			populateEditForm(uiModel, authUser);
+			return "authusers/register";
+		}
+        uiModel.asMap().clear();
+        
+        authUser.setPassword(calcHash(authUser.getPassword()));
+        
+        authUser.setEnabled(true);
+        
+        authUser.getRoles().clear();
+        authUser.getRoles().add(AuthRole.findAuthRolesByNameEquals("ROLE_USER").getSingleResult());
+        
+        authUser.getTasks().clear();
+        
+        authUser.persist();
+        return "redirect:/tasks";
+    }
+    
 	@RequestMapping(method = RequestMethod.POST, produces = "text/html")
     public String create(@Valid AuthUser authUser, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) throws NoSuchAlgorithmException {
         if (bindingResult.hasErrors()) {
@@ -32,6 +57,13 @@ public class AuthUserController {
         uiModel.asMap().clear();
         
         authUser.setPassword(calcHash(authUser.getPassword()));
+        
+        if(authUser.getRoles().size()==0){
+        	authUser.getRoles().clear();
+        	authUser.getRoles().add(AuthRole.findAuthRolesByNameEquals("ROLE_USER").getSingleResult());
+        }
+        
+        authUser.getTasks().clear();
         
         authUser.persist();
         return "redirect:/authusers/" + encodeUrlPathSegment(authUser.getId().toString(), httpServletRequest);
@@ -53,23 +85,6 @@ public class AuthUserController {
         }
         authUser.merge();
         return "redirect:/authusers/" + encodeUrlPathSegment(authUser.getId().toString(), httpServletRequest);
-    }
-
-	void populateEditForm(Model uiModel, AuthUser authUser) {
-        uiModel.addAttribute("authUser", authUser);
-        uiModel.addAttribute("authroles", AuthRole.findAllAuthRoles());
-        uiModel.addAttribute("tasks", Task.findAllTasks());
-    }
-
-	String encodeUrlPathSegment(String pathSegment, HttpServletRequest httpServletRequest) {
-        String enc = httpServletRequest.getCharacterEncoding();
-        if (enc == null) {
-            enc = WebUtils.DEFAULT_CHARACTER_ENCODING;
-        }
-        try {
-            pathSegment = UriUtils.encodePathSegment(pathSegment, enc);
-        } catch (UnsupportedEncodingException uee) {}
-        return pathSegment;
     }
 	
 	private String calcHash(String password) throws NoSuchAlgorithmException{
