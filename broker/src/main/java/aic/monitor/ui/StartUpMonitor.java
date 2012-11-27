@@ -16,7 +16,7 @@ public class StartUpMonitor {
 	/**
 	 * Placeholder for later, we can use this variable to externally terminate the run-loop.
 	 */
-	static boolean running = true;
+	static boolean running = false;
 
 	public static void main(String[] args) {
 		Properties properties = new Properties();
