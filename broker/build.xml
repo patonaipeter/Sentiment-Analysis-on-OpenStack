@@ -1,37 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="broker" default="run-monitor" basedir=".">
-    <description>
+	<description>
         A simple openstack monitor
     </description>
 
-    <!-- set global properties for this build -->
-    <property name="src.dir" location="src/main/java"/>
-    <property name="build.dir" location="target/classes"/>
-    <property name="resources.dir" location="src/main/resources/"/>
-	<property name="lib.dir" location="lib/"/>
+	<!-- set global properties for this build -->
+	<property name="src.dir" location="src/main/java" />
+	<property name="build.dir" location="target/classes" />
+	<property name="resources.dir" location="src/main/resources/" />
+	<path id="lib.dir">
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/openstack/keystone-client/2.0.0-SNAPSHOT/keystone-client-2.0.0-SNAPSHOT.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/openstack/openstack-client/2.0.0-SNAPSHOT/openstack-client-2.0.0-SNAPSHOT.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/glassfish/jersey/core/jersey-client/2.0-SNAPSHOT/jersey-client-2.0-SNAPSHOT.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/glassfish/jersey/core/jersey-common/2.0-SNAPSHOT/jersey-common-2.0-SNAPSHOT.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/javax/ws/rs/javax.ws.rs-api/2.0-m12/javax.ws.rs-api-2.0-m12.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/com/google/guava/guava/13.0/guava-13.0.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/glassfish/hk2/hk2-api/2.1.41/hk2-api-2.1.41.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/glassfish/hk2/osgi-resource-locator/1.0.1/osgi-resource-locator-1.0.1.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/javax/inject/javax.inject/1/javax.inject-1.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/glassfish/hk2/hk2-utils/2.1.41/hk2-utils-2.1.41.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/glassfish/hk2/hk2-locator/2.1.41/hk2-locator-2.1.41.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/glassfish/hk2/external/javax.inject/2.1.41/javax.inject-2.1.41.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/glassfish/hk2/external/asm-all-repackaged/2.1.41/asm-all-repackaged-2.1.41.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/glassfish/hk2/external/cglib/2.1.41/cglib-2.1.41.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/glassfish/jersey/media/jersey-media-json-jackson/2.0-SNAPSHOT/jersey-media-json-jackson-2.0-SNAPSHOT.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/codehaus/jackson/jackson-core-asl/1.9.8/jackson-core-asl-1.9.8.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/codehaus/jackson/jackson-jaxrs/1.9.8/jackson-jaxrs-1.9.8.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/codehaus/jackson/jackson-xc/1.9.8/jackson-xc-1.9.8.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/openstack/keystone-model/2.0.0-SNAPSHOT/keystone-model-2.0.0-SNAPSHOT.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.8/jackson-mapper-asl-1.9.8.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/openstack/nova-client/2.0.0-SNAPSHOT/nova-client-2.0.0-SNAPSHOT.jar" />
+		<pathelement location="/home/sebastiangeiger/.m2/repository/org/openstack/nova-model/2.0.0-SNAPSHOT/nova-model-2.0.0-SNAPSHOT.jar" />
+	</path>
 
-    <!--<property name="lib.dir" location="lib" />-->
+	<!--<property name="lib.dir" location="lib" />-->
 
-    <path id="project.classpath">
-        <fileset dir="${lib.dir}">
-            <include name="keystone-client-2.0.0-SNAPSHOT.jar"/>
-        	<include name="nova-client-2.0.0-SNAPSHOT.jar"/>
-        </fileset>
-        <pathelement location="${build.dir}"/>
-        <pathelement location="${resources.dir}"/>
-    </path>
+	<path id="project.classpath">
+		<path refid="lib.dir"/>
+		<pathelement location="${build.dir}" />
+		<pathelement location="${resources.dir}" />
+	</path>
 
-    <target name="init">
-        <!-- Create the time stamp -->
-        <tstamp/>
-        <!-- Create the build directory structure used by compile -->
-    </target>
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp />
+		<!-- Create the build directory structure used by compile -->
+	</target>
 
-    <target name="run-monitor" description="run the monitor" >
-        <java classname="aic.monitor.ui.StartUpMonitor"
-            classpathref="project.classpath"
-            fork="true"
-        />
-    </target>
+	<target name="run-monitor" description="run the monitor">
+		<java classname="aic.monitor.ui.StartUpMonitor" classpathref="project.classpath" fork="true" />
+	</target>
 
 </project>
