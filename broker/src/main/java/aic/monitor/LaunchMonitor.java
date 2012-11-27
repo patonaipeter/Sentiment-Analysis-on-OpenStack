@@ -1,6 +1,5 @@
 package aic.monitor;
 
-import java.io.FileInputStream;
 import java.util.Calendar;
 import java.util.Properties;
 
@@ -17,9 +16,7 @@ import org.openstack.nova.NovaClient;
 import org.openstack.nova.api.FlavorsCore;
 import org.openstack.nova.api.ImagesCore;
 import org.openstack.nova.api.ServersCore;
-import org.openstack.nova.model.Flavor;
 import org.openstack.nova.model.Flavors;
-import org.openstack.nova.model.Image;
 import org.openstack.nova.model.Images;
 import org.openstack.nova.model.Server;
 import org.openstack.nova.model.ServerForCreate;
@@ -33,7 +30,7 @@ public class LaunchMonitor {
 	private String KEY_NAME;
 	private String SECURITY_GROUP_NAME;
 	private Access serverAccess = null;
-	
+
 	public LaunchMonitor(Properties p){
 		this.KEYSTONE_AUTH_URL = p.getProperty("openstack_url");
 		this.KEYSTONE_USERNAME = p.getProperty("openstack_username");
@@ -41,7 +38,7 @@ public class LaunchMonitor {
 		this.KEY_NAME = p.getProperty("openstack_key");
 		this.SECURITY_GROUP_NAME = p.getProperty("openstack_security_group");
 	}
-	
+
 	public LaunchMonitor(String url,
 			String username,
 			String password,
@@ -150,63 +147,5 @@ public class LaunchMonitor {
 				serverAccess.getToken().getId());
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Properties properties = new Properties();
-		try {
-			properties.loadFromXML(new FileInputStream("properties.xml"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		} 
-		
-		// TODO Auto-generated method stub
-		LaunchMonitor monitor = new LaunchMonitor(properties);
 
-		String flavorRef = null;
-		String imgRef = null;
-
-		// print all flavors
-		for (Flavor flavor : monitor.getFlavors()) {
-			if (flavor.getName().equals("m1.tiny.win"))
-				flavorRef = flavor.getLinks().get(0).getHref();
-			System.out.println(flavor);
-		}
-
-		// print all images
-		for (Image image : monitor.getImages()) {
-			if (image.getName().equals("Ubuntu 12.10 amd64")) {
-				imgRef = image.getLinks().get(0).getHref();
-			}
-			System.out.println(image);
-		}
-
-		// print all instances
-		for (Server server : monitor.getServers()) {
-			System.out.println(server);
-		}
-
-		if (!(imgRef == null && flavorRef == null)) {
-			// start instance
-			Server server = monitor.createServer("new-server-from-java",
-					flavorRef, imgRef);
-			// waiting for ACTIVE state
-			Boolean isActive = false;
-			while (!isActive) {
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				isActive = monitor.getServer(server.getId()).getStatus()
-						.equals("ACTIVE");
-			}
-			// terminate instance
-			monitor.terminateServer(server.getId());
-		}
-
-		// stop started instance
-
-	}
 }
