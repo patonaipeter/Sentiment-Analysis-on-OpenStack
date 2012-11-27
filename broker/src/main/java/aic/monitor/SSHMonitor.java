@@ -67,9 +67,9 @@ public class SSHMonitor {
 			IOException {
 		SSHMonitor m = new SSHMonitor("ubuntu", "10.99.0.98");
 		System.out.println(m.getLoadAvg());
-		System.out.println(m.getFreeMemory());
-		System.out.println(m.getFreeMemory());
-		System.out.println(m.getFreeMemory());
+//		System.out.println(m.getFreeMemory());
+//		System.out.println(m.getFreeMemory());
+//		System.out.println(m.getFreeMemory());
 		System.out.println(m.getCpuUsage());
 		m.close();
 	}
