@@ -1,10 +1,15 @@
 package aic.service.test;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -277,22 +282,34 @@ public class SimpleTest {
 		final int req=Integer.parseInt(in.readLine());
 		System.out.println("Please enter # of threads: ");
 		int threads=Integer.parseInt(in.readLine());
+		System.out.println("Please enter output filename for stats: ");
+		final String filename=in.readLine();
+		final AtomicInteger count=new AtomicInteger(0);
 		
 		if(req>0 && threads>0){
 			for(int j=0;j<threads;j++){
 				new Thread(new Runnable(){
 					public void run(){
+						BufferedWriter out = null;
 						try {
 							java.util.Random random = new java.util.Random();
 							final int start = random.nextInt(searchTerms.length);
 							final int end=req+start;
+							
+							out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename + count.getAndIncrement() + ".dat")));
 									
 							SimpleTest test = new SimpleTest(host,name);
 							for(int i=start;i<end;i++){
+								long tmp = System.currentTimeMillis();
 								test.analyseSentiment(searchTerms[i%searchTerms.length]);
+								out.write((System.currentTimeMillis() - tmp) + "\n");
 							}
-						} catch (UnknownHostException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
+						}finally{
+							if(out!=null){
+								try {out.close();} catch (IOException e) {}
+							}
 						}
 					}
 				}).start();
