@@ -66,19 +66,10 @@ public class StartUpMonitor {
 		}
 
 		// print all flavors
-		for (Flavor flavor : monitor.getFlavors()) {
-			if (flavor.getName().equals("m1.tiny.win"))
-				flavorRef = flavor.getLinks().get(0).getHref();
-			System.out.println(flavor);
-		}
+		flavorRef = getFlaverName(monitor, flavorRef);
 
 		// print all images
-		for (Image image : monitor.getImages()) {
-			if (image.getName().equals("Ubuntu 12.10 amd64")) {
-				imgRef = image.getLinks().get(0).getHref();
-			}
-			System.out.println(image);
-		}
+		imgRef = getImageName(monitor, imgRef);
 
 		// print all instances
 		for (Server server : monitor.getServers()) {
@@ -105,5 +96,24 @@ public class StartUpMonitor {
 		}
 
 		// TODO: stop started instance
+	}
+
+	private static String getImageName(LaunchMonitor monitor, String imgRef) {
+		for (Image image : monitor.getImages()) {
+			if (image.getName().equals("Ubuntu 12.10 amd64")) {
+				imgRef = image.getLinks().get(0).getHref();
+			}
+			System.out.println(image);
+		}
+		return imgRef;
+	}
+
+	private static String getFlaverName(LaunchMonitor monitor, String flavorRef) {
+		for (Flavor flavor : monitor.getFlavors()) {
+			if (flavor.getName().equals("m1.tiny.win"))
+				flavorRef = flavor.getLinks().get(0).getHref();
+			System.out.println(flavor);
+		}
+		return flavorRef;
 	}
 }
