@@ -13,6 +13,12 @@ public class StartUpMonitor {
 	/**
 	 * @param args
 	 */
+
+	/**
+	 * Placeholder for later, we can use this variable to externally terminate the run-loop.
+	 */
+	static boolean running = true;
+
 	public static void main(String[] args) {
 		Properties properties = new Properties();
 		try {
@@ -25,6 +31,39 @@ public class StartUpMonitor {
 
 		String flavorRef = null;
 		String imgRef = null;
+
+		while(running) {
+			// The broker needs to perform a few steps in order to determine the current load
+			// of the cloud and decide whether to start a new instance or stop a running instance
+			// These steps should run in a loop that is active all the time while the broker is running.
+			//1. Get the information of all running instances
+			//   We need to manage a list of all instances (running and stopped), then we poll the active ones
+			//   and retrieve the data from them, using the SshMonitor.
+			/**
+			 * double loadValue = monitor.getCloudMetrci();
+			 */
+
+			//2. Evaluate the load based on the data that was returned by the SshMonitor. It will be best to
+			//   calculate some sort of metric from the information so we have a single value to decide if we
+			//   need to start or stop an instance
+			/**
+			 *
+			 */
+
+			//3. We need to pass the value to a strategy class that decides if an instance needs to be started or
+			//   stopped, particularly the strategy class needs to keep a history of the previous states the cloud was
+			//   in, so we can compensate fluctuation (periodic starting/stopping of instances)
+
+
+			//4. When we have decided on a suitable strategy then it needs to be executed and the right instance must be
+			//   stopped or a new one must be started. Maybe we will need to handle the case somehow that no new instance can
+			//   be started.
+			/**
+			 * Strategy strategy;
+			 *
+			 * strategy.execute();
+			 */
+		}
 
 		// print all flavors
 		for (Flavor flavor : monitor.getFlavors()) {
