@@ -65,7 +65,7 @@ public class SSHMonitor {
 
 	public static void main(String[] args) throws NumberFormatException,
 			IOException {
-		SSHMonitor m = new SSHMonitor("ubuntu", "10.99.0.94");
+		SSHMonitor m = new SSHMonitor("ubuntu", "10.99.0.98");
 		System.out.println(m.getLoadAvg());
 		System.out.println(m.getFreeMemory());
 		System.out.println(m.getFreeMemory());
