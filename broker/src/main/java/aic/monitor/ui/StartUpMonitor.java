@@ -86,8 +86,8 @@ public class StartUpMonitor {
 		}
 
 		if (!(imgRef == null && flavorRef == null)) {
-			// start instance
-			Server server = monitor.createServer("new-server-from-java",
+			// start instance, the instance will be named mX with X being in [2,7]
+			Server server = monitor.createServer("m" + 2,
 					flavorRef, imgRef);
 			// waiting for ACTIVE state
 			Boolean isActive = false;
