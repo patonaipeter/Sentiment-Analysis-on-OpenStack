@@ -26,11 +26,16 @@ public class SSHMonitor {
 			input = new BufferedReader(new InputStreamReader(
 					process.getInputStream()));
 			output = new OutputStreamWriter(process.getOutputStream());
+			input.read(new char[1024]);
 		}
 	}
 
-	public void close() {
+	public void close() throws IOException {
+		output.write("exit\n");
+		output.flush();
 		if (process != null) {
+			output.close();
+			input.close();
 			process.destroy();
 			process = null;
 		}
@@ -45,7 +50,11 @@ public class SSHMonitor {
 	public float getLoadAvg() throws IOException {
 		output.write("cat /proc/loadavg\n");
 		output.flush();
-		return Float.parseFloat(input.readLine().substring(0, 4));
+		String loadString = input.readLine();
+		//The load string looks something like this: "0.79 0.83 0.95 1/600 25019"
+		//We will take the second value from this list of floats (which is the load average from the last few minutes)
+		String[] tokens = loadString.split("");
+		return Float.parseFloat(tokens[1]);
 	}
 
 	public float getCpuUsage() throws IOException {
@@ -56,7 +65,7 @@ public class SSHMonitor {
 	}
 
 	public void restartMongoDb() throws IOException {
-		// to install mpstat: sudo apt-get install sysstat 
+		// to install mpstat: sudo apt-get install sysstat
 		output.write("sudo /etc/init.d/mongodb restart\n");
 		output.flush();
 		// skip the rest
