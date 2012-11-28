@@ -9,7 +9,7 @@ import org.openstack.nova.model.ServerAction.Resume;
 import org.openstack.nova.model.ServerAction.Suspend;
 
 public class SuspendResumeServerExtension {
-	public class ResumeServer implements NovaCommand<Void> {
+	public static class ResumeServer implements NovaCommand<Void> {
 
 		private Resume action;
 
@@ -30,7 +30,7 @@ public class SuspendResumeServerExtension {
 
 	}
 
-	public class SuspendServer implements NovaCommand<Void> {
+	public static class SuspendServer implements NovaCommand<Void> {
 
 		private Suspend action;
 
@@ -51,11 +51,11 @@ public class SuspendResumeServerExtension {
 
 	}
 
-	public ResumeServer resume(String id) {
+	public static ResumeServer resume(String id) {
 		return new ResumeServer(id);
 	}
 
-	public SuspendServer suspend(String id) {
+	public static SuspendServer suspend(String id) {
 		return new SuspendServer(id);
 	}
 }

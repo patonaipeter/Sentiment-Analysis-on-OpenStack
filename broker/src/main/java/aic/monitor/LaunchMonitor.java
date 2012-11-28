@@ -23,7 +23,12 @@ import org.openstack.nova.model.Server;
 import org.openstack.nova.model.ServerForCreate;
 import org.openstack.nova.model.Servers;
 import org.openstack.nova.model.Volume;
+import org.openstack.nova.model.VolumeAttachment;
+import org.openstack.nova.model.VolumeForCreate;
 import org.openstack.nova.model.Volumes;
+
+import aic.openstack.SuspendResumeServerExtension;
+import aic.openstack.mServersCore;
 
 public class LaunchMonitor {
 
@@ -42,16 +47,21 @@ public class LaunchMonitor {
 		this.SECURITY_GROUP_NAME = p.getProperty("openstack_security_group");
 	}
 
-	public LaunchMonitor(String url,
-			String username,
-			String password,
-			String key,
-			String security_group){
+	public LaunchMonitor(String url, String username, String password,
+			String key, String security_group) {
 		this.KEYSTONE_AUTH_URL = url;
 		this.KEYSTONE_USERNAME = username;
 		this.KEYSTONE_PASSWORD = password;
 		this.KEY_NAME = key;
 		this.SECURITY_GROUP_NAME = security_group;
+	}
+
+	public void suspendServer(String id) {
+		this.getNovaClient().execute(SuspendResumeServerExtension.suspend(id));
+	}
+
+	public void resumeServer(String id) {
+		this.getNovaClient().execute(SuspendResumeServerExtension.resume(id));
 	}
 
 	public Server createServer(String serverName, String flavorRef,
@@ -68,7 +78,7 @@ public class LaunchMonitor {
 		// create server
 		Server server = this.getNovaClient().execute(
 				ServersCore.createServer(serverForCreate));
-		
+
 		System.out.println(server);
 
 		return server;
@@ -89,18 +99,50 @@ public class LaunchMonitor {
 	public Images getImages() {
 		return this.getNovaClient().execute(ImagesCore.listImages());
 	}
+
+	public Volumes getVolumes() {
+		return this.getNovaClient().execute(VolumesExtension.listVolumes());
+	}
 	
-	// volumes part. not neccessary now, but should be here
-//	public Volumes getVolumes(){
-//		return this.getNovaClient().execute(VolumesExtension.listVolumes());
-//	}
-//	
-//	public void attachVolume(Volume v){
-////		return this.getNovaClient().execute(VolumesExtension.attachVolume(serverId, volumeId, device))
-//	}
+	public Volume getVolume(String id){
+		for (Volume volume : this.getVolumes()) {
+			if (volume.getId().equals(id)) {
+				System.out.println(volume);
+				return volume;
+			}
+		}
+	}
+
+	public void attachVolume(String serverId, String volumeId, String device) {
+		this.getNovaClient().execute(
+				VolumesExtension.attachVolume(serverId, volumeId, device));
+	}
 	
+	public void detachVolume(String serverId, String volumeId){
+		this.getNovaClient().execute(VolumesExtension.detachVolume(serverId, volumeId));
+	}
+	
+	public Volume createVolume(String serverId){
+		// define volume
+		VolumeForCreate volumeForCreate =new VolumeForCreate();
+		// TODO: init volume properties
+		
+		// create volume
+		Volume volume = this.getNovaClient().execute(VolumesExtension.createVolume(volumeForCreate));
+		
+		System.out.println(volume);
+		
+		return volume;
+	}
+	
+	public void deleteVolume(String id){
+		this.getNovaClient().execute(VolumesExtension.deleteVolume(id));
+	}
+	
+
 	/**
-	 * @param id Server id
+	 * @param id
+	 *            Server id
 	 * @return Returns Server with @id, if it exists. Otherwise null.
 	 */
 	public Server getServer(String id) {
@@ -154,9 +196,9 @@ public class LaunchMonitor {
 			}
 		}
 
-		return new NovaClient(KeystoneUtils.findEndpointURL(serverAccess.getServiceCatalog(), "compute", null, "public"),
-							  serverAccess.getToken().getId());
+		return new NovaClient(KeystoneUtils.findEndpointURL(
+				serverAccess.getServiceCatalog(), "compute", null, "public"),
+				serverAccess.getToken().getId());
 	}
-
 
 }
