@@ -68,7 +68,7 @@ public class LaunchMonitor {
 		// create server
 		Server server = this.getNovaClient().execute(
 				ServersCore.createServer(serverForCreate));
-
+		
 		System.out.println(server);
 
 		return server;
@@ -90,13 +90,14 @@ public class LaunchMonitor {
 		return this.getNovaClient().execute(ImagesCore.listImages());
 	}
 	
-	public Volumes getVolumes(){
-		return this.getNovaClient().execute(VolumesExtension.listVolumes());
-	}
-	
-	public void attachVolume(Volume v){
-//		return this.getNovaClient().execute(VolumesExtension.attachVolume(serverId, volumeId, device))
-	}
+	// volumes part. not neccessary now, but should be here
+//	public Volumes getVolumes(){
+//		return this.getNovaClient().execute(VolumesExtension.listVolumes());
+//	}
+//	
+//	public void attachVolume(Volume v){
+////		return this.getNovaClient().execute(VolumesExtension.attachVolume(serverId, volumeId, device))
+//	}
 	
 	/**
 	 * @param id Server id
