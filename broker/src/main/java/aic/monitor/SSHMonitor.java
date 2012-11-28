@@ -26,30 +26,37 @@ public class SSHMonitor {
 			input = new BufferedReader(new InputStreamReader(
 					process.getInputStream()));
 			output = new OutputStreamWriter(process.getOutputStream());
-			input.read(new char[1024]);
+			skipOutput();
 		}
+	}
+	
+	public void skipOutput() throws IOException{
+		input.read(new char[1024]);
 	}
 
 	public void closeConnection() throws IOException {
-		output.write("exit\n");
-		output.flush();
 		if (process != null) {
+			executeCommand("exit");
 			output.close();
 			input.close();
 			process.destroy();
 			process = null;
 		}
 	}
+	
+	public BufferedReader executeCommand(String cmd) throws IOException{
+		output.write(cmd + "\n");
+		output.flush();
+		return input;
+	}
 
 	public long getFreeMemory() throws IOException {
-		output.write("free -b | grep 'Mem:'\n");
-		output.flush();
+		BufferedReader input = executeCommand("free -b | grep 'Mem:'");
 		return Long.parseLong(input.readLine().split("\\s+")[3]);
 	}
 
 	public float getLoadAvg() throws IOException {
-		output.write("cat /proc/loadavg\n");
-		output.flush();
+		BufferedReader input = executeCommand("cat /proc/loadavg");
 		String loadString = input.readLine();
 		//The load string looks something like this: "0.79 0.83 0.95 1/600 25019"
 		//We will take the second value from this list of floats (which is the load average from the last few minutes)
@@ -59,17 +66,14 @@ public class SSHMonitor {
 
 	public float getCpuUsage() throws IOException {
 		// to install mpstat: sudo apt-get install sysstat
-		output.write("mpstat 1 1 | grep Average:\n");
-		output.flush();
+		BufferedReader input = executeCommand("mpstat 1 1 | grep Average:");
 		return 100 - Float.parseFloat(input.readLine().split("\\s+")[10]);
 	}
 
 	public void restartMongoDb() throws IOException {
 		// to install mpstat: sudo apt-get install sysstat
-		output.write("sudo /etc/init.d/mongodb restart\n");
-		output.flush();
-		// skip the rest
-		input.read(new char[1024]);
+		executeCommand("sudo /etc/init.d/mongodb restart");
+		skipOutput();
 	}
 
 	public static void main(String[] args) throws NumberFormatException,
