@@ -30,7 +30,7 @@ public class SSHMonitor {
 		}
 	}
 
-	public void close() throws IOException {
+	public void closeConnection() throws IOException {
 		output.write("exit\n");
 		output.flush();
 		if (process != null) {
@@ -80,6 +80,6 @@ public class SSHMonitor {
 //		System.out.println(m.getFreeMemory());
 //		System.out.println(m.getFreeMemory());
 		System.out.println(m.getCpuUsage());
-		m.close();
+		m.closeConnection();
 	}
 }
