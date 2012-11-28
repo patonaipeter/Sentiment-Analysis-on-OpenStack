@@ -174,7 +174,7 @@ public class StartUpMonitor {
 			if(loadValue>0.9){
 				//start new instance
 				startNewInstance();
-			}else if(loadValue<0.2){
+			}else if(loadValue<0.2 && managedInstances.size()>0){
 				//shut instance down
 				terminateInstance();
 			}
