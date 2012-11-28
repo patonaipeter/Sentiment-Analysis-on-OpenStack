@@ -109,6 +109,8 @@ public class LaunchMonitor {
 				return volume;
 			}
 		}
+		
+		return null;
 	}
 
 	public void attachVolume(String serverId, String volumeId, String device) {
