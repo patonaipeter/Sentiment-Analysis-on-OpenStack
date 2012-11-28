@@ -2,7 +2,6 @@ package aic.monitor.ui;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Properties;
 
@@ -22,7 +21,7 @@ public class StartUpMonitor {
 	private Hashtable<Server, SSHMonitor> managedInstances = new Hashtable<Server, SSHMonitor>();
 
 	//instances that are newly created and ready to be included into managedInstances
-	final private ArrayList<Server> readyInstances=new ArrayList<Server>();
+	final private Hashtable<Server, SSHMonitor> readyInstances=new Hashtable<Server, SSHMonitor>();
 	final private LaunchMonitor monitor;
 	private String flavorRef;
 	private String imgRef;
@@ -75,9 +74,25 @@ public class StartUpMonitor {
 					
 					addToShard(s);
 					
-					synchronized(readyInstances){
-						readyInstances.add(s);
+					
+					try {
+						synchronized(readyInstances){
+							readyInstances.put(s, new SSHMonitor("ubuntu",s.getAccessIPv4()));
+						}
+					} catch (IOException e) {
+						//try again after 10 seconds maybe ssh server is not ready yet
+						try {Thread.sleep(10000);} catch (InterruptedException e1) {}
+						
+						try {
+							synchronized(readyInstances){
+								readyInstances.put(s, new SSHMonitor("ubuntu",s.getAccessIPv4()));
+							}
+						} catch (IOException e1) {
+							//its no use the server is not reachable
+							e1.printStackTrace();
+						}
 					}
+					
 				}
 			});
 
@@ -88,20 +103,34 @@ public class StartUpMonitor {
 	 * adds the server to the mongodb shard
 	 */
 	public void addToShard(Server s){
-		//TODO we need to add it with mongo serverip:port/dbname --eval "sh.addShard(serverip)"
+		try {
+			Runtime.getRuntime().exec("mongo tweets --eval \"sh.addShard('" + s.getAccessIPv4() + ":27018')\"");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/*
 	 * removes the server from the mongodb shard
 	 */
 	public void removeFromShard(Server s){
-		//TODO we need to remove it with mongo serverip:port/dbname --eval "something"
-		//TODO we first need to "drain" it with mongo serverip:port/dbname --eval "sh.status()"
+		try {
+			Runtime.getRuntime().exec("mongo tweets --eval \"use admin;db.runCommand( {removeShard: '" + s.getAccessIPv4() + ":27018'} )\"");
+			Process child=null;
+			do{
+				Thread.sleep(10000);
+				child=Runtime.getRuntime().exec("mongo tweets --eval \"sh.status()\" | grep -q -i draining");
+				child.waitFor();
+			}while(child.exitValue()==0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/*
 	 * it immediatly removes the top server from managesInstances and starts a thread
 	 * to do the rest since removeFromShard could take some time
+	 * TODO suspend instead of terminate
 	 */
 	public void terminateInstance() {
 		final Server server = managedInstances.keys().nextElement();
@@ -162,9 +191,7 @@ public class StartUpMonitor {
 			//   We need to manage a list of all instances (running and stopped), then we poll the active ones
 			//   and retrieve the data from them, using the SshMonitor.
 			synchronized(readyInstances){
-				for(Server s : readyInstances){
-					managedInstances.put(s, new SSHMonitor("ubuntu",s.getAccessIPv4()));
-				}
+				managedInstances.putAll(readyInstances);
 				readyInstances.clear();
 			}
 
