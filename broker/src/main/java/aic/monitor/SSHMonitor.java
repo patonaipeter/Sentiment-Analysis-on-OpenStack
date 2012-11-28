@@ -45,6 +45,10 @@ public class SSHMonitor {
 	}
 	
 	public BufferedReader executeCommand(String cmd) throws IOException{
+		//read everything before starting a new command
+		while(input.ready()){
+			skipOutput();
+		}
 		output.write(cmd + "\n");
 		output.flush();
 		return input;
