@@ -16,11 +16,14 @@ import org.openstack.nova.NovaClient;
 import org.openstack.nova.api.FlavorsCore;
 import org.openstack.nova.api.ImagesCore;
 import org.openstack.nova.api.ServersCore;
+import org.openstack.nova.api.extensions.VolumesExtension;
 import org.openstack.nova.model.Flavors;
 import org.openstack.nova.model.Images;
 import org.openstack.nova.model.Server;
 import org.openstack.nova.model.ServerForCreate;
 import org.openstack.nova.model.Servers;
+import org.openstack.nova.model.Volume;
+import org.openstack.nova.model.Volumes;
 
 public class LaunchMonitor {
 
@@ -86,7 +89,15 @@ public class LaunchMonitor {
 	public Images getImages() {
 		return this.getNovaClient().execute(ImagesCore.listImages());
 	}
-
+	
+	public Volumes getVolumes(){
+		return this.getNovaClient().execute(VolumesExtension.listVolumes());
+	}
+	
+	public void attachVolume(Volume v){
+//		return this.getNovaClient().execute(VolumesExtension.attachVolume(serverId, volumeId, device))
+	}
+	
 	/**
 	 * @param id Server id
 	 * @return Returns Server with @id, if it exists. Otherwise null.
