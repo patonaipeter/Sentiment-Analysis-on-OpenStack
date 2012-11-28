@@ -107,6 +107,9 @@ public class StartUpMonitor {
 	public void terminateInstance(){
 		final Server s=managedInstances.get(managedInstances.size()-1);
 		managedInstances.remove(managedInstances.size()-1);
+		SSHMonitor m = sshConnections.get(sshConnections.size()-1);
+		sshConnections.remove(sshConnections.size()-1);
+		try {m.close();} catch (IOException e) {}
 		
 		new Thread(new Runnable(){
 			public void run(){
