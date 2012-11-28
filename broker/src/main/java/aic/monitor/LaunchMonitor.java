@@ -1,5 +1,6 @@
 package aic.monitor;
 
+import java.io.FileInputStream;
 import java.util.Calendar;
 import java.util.Properties;
 
@@ -17,7 +18,9 @@ import org.openstack.nova.api.FlavorsCore;
 import org.openstack.nova.api.ImagesCore;
 import org.openstack.nova.api.ServersCore;
 import org.openstack.nova.api.extensions.VolumesExtension;
+import org.openstack.nova.model.Flavor;
 import org.openstack.nova.model.Flavors;
+import org.openstack.nova.model.Image;
 import org.openstack.nova.model.Images;
 import org.openstack.nova.model.Server;
 import org.openstack.nova.model.ServerForCreate;
@@ -101,15 +104,15 @@ public class LaunchMonitor {
 	public Volumes getVolumes() {
 		return this.getNovaClient().execute(VolumesExtension.listVolumes());
 	}
-	
-	public Volume getVolume(String id){
+
+	public Volume getVolume(String id) {
 		for (Volume volume : this.getVolumes()) {
 			if (volume.getId().equals(id)) {
 				System.out.println(volume);
 				return volume;
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -117,28 +120,29 @@ public class LaunchMonitor {
 		this.getNovaClient().execute(
 				VolumesExtension.attachVolume(serverId, volumeId, device));
 	}
-	
-	public void detachVolume(String serverId, String volumeId){
-		this.getNovaClient().execute(VolumesExtension.detachVolume(serverId, volumeId));
+
+	public void detachVolume(String serverId, String volumeId) {
+		this.getNovaClient().execute(
+				VolumesExtension.detachVolume(serverId, volumeId));
 	}
-	
-	public Volume createVolume(String serverId){
+
+	public Volume createVolume(String serverId) {
 		// define volume
-		VolumeForCreate volumeForCreate =new VolumeForCreate();
+		VolumeForCreate volumeForCreate = new VolumeForCreate();
 		// TODO: init volume properties
-		
+
 		// create volume
-		Volume volume = this.getNovaClient().execute(VolumesExtension.createVolume(volumeForCreate));
-		
+		Volume volume = this.getNovaClient().execute(
+				VolumesExtension.createVolume(volumeForCreate));
+
 		System.out.println(volume);
-		
+
 		return volume;
 	}
-	
-	public void deleteVolume(String id){
+
+	public void deleteVolume(String id) {
 		this.getNovaClient().execute(VolumesExtension.deleteVolume(id));
 	}
-	
 
 	/**
 	 * @param id
@@ -199,6 +203,105 @@ public class LaunchMonitor {
 		return new NovaClient(KeystoneUtils.findEndpointURL(
 				serverAccess.getServiceCatalog(), "compute", null, "public"),
 				serverAccess.getToken().getId());
+	}
+
+	/**
+	 * It's not a usable method. It's just example, how to use LaunchMonitor.
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Properties properties = new Properties();
+		try {
+			properties.loadFromXML(new FileInputStream("properties.xml"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// TODO Auto-generated method stub
+		LaunchMonitor monitor = new LaunchMonitor(properties);
+
+		String flavorRef = null;
+		String imgRef = null;
+
+		// print all flavors
+		for (Flavor flavor : monitor.getFlavors()) {
+			if (flavor.getName().equals("m1.tiny"))
+				flavorRef = flavor.getLinks().get(0).getHref();
+			System.out.println(flavor);
+		}
+
+		// print all images
+		for (Image image : monitor.getImages()) {
+			if (image.getName().equals("Ubuntu 12.10 amd64")) {
+				imgRef = image.getLinks().get(0).getHref();
+			}
+			System.out.println(image);
+		}
+
+		// print all instances
+		for (Server server : monitor.getServers()) {
+			System.out.println(server);
+		}
+
+		if (!(imgRef == null && flavorRef == null)) {
+			// start instance
+			Server server = monitor.createServer("new-server-from-java",
+					flavorRef, imgRef);
+			// waiting for ACTIVE state
+			Boolean isActive = false;
+			while (!isActive) {
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				isActive = monitor.getServer(server.getId()).getStatus()
+						.equals("ACTIVE");
+			}
+			// suspend instance
+			monitor.suspendServer(server.getId());
+			// waiting for SUSPEND state
+			Boolean isSuspended = false;
+			while (!isSuspended) {
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				isSuspended = monitor.getServer(server.getId()).getStatus()
+						.equals("SUSPENDED");
+			}
+			// resume instance
+			monitor.resumeServer(server.getId());
+			// waiting for RESUME state
+			Boolean isResumed = false;
+			while (!isResumed) {
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				isResumed = monitor.getServer(server.getId()).getStatus()
+						.equals("ACTIVE");
+			}
+			// terminate instance
+			monitor.terminateServer(server.getId());
+			
+			while (monitor.getServer(server.getId()) != null){
+				System.out.printf("Waiting for %s being terminated...", server.getId());
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			System.out.printf("Server %s has been terminated succesfully.", server.getId());
+		}
+
+		// stop started instance
+
 	}
 
 }
