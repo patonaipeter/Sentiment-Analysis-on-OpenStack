@@ -23,12 +23,10 @@ import org.openstack.nova.model.Server;
 import org.openstack.nova.model.ServerForCreate;
 import org.openstack.nova.model.Servers;
 import org.openstack.nova.model.Volume;
-import org.openstack.nova.model.VolumeAttachment;
 import org.openstack.nova.model.VolumeForCreate;
 import org.openstack.nova.model.Volumes;
 
 import aic.openstack.SuspendResumeServerExtension;
-import aic.openstack.mServersCore;
 
 public class LaunchMonitor {
 
