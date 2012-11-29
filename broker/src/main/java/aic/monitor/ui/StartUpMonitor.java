@@ -1,15 +1,16 @@
 package aic.monitor.ui;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import org.openstack.nova.model.Flavor;
-import org.openstack.nova.model.Image;
 import org.openstack.nova.model.Server;
 
-import aic.monitor.*;
+import aic.monitor.LaunchMonitor;
+import aic.monitor.SSHMonitor;
+import aic.monitor.ServerConnection;
+import aic.monitor.SimpleStrategy;
+import aic.monitor.Strategy;
 import aic.monitor.util.PropertyManager;
 
 public class StartUpMonitor {
