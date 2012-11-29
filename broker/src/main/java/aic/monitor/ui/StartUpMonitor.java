@@ -68,7 +68,7 @@ public class StartUpMonitor {
 		int active = 0;
 		
 		for(ServerConnection s : managedInstances){
-			if(s.getServer().getStatus().equals("ACTIVE")){
+			if(s.getServer()!=null && s.getServer().getStatus().equals("ACTIVE")){
 				active++;
 			}
 		}
@@ -77,20 +77,21 @@ public class StartUpMonitor {
 			
 			
 			for(ServerConnection s : managedInstances){
-				if(s.getServer().getStatus().equals("ACTIVE") && !s.isPrimary()){
+				if(s.getServer()!=null && s.getServer().getStatus().equals("ACTIVE") && !s.isPrimary()){
 					final ServerConnection con = s;
+					final Server server = con.getServer();
+					final SSHMonitor ssh = con.getSsh();
+					con.setSsh(null);
+					con.setServer(null);
 					
 					new Thread(new Runnable(){
 						public void run(){
-							Server server = con.getServer();
 							String id = server.getId();
 							
 							removeShard(server);
 							//close ssh connection
 							try {
-								SSHMonitor m = con.getSsh();
-								con.setSsh(null);
-								m.closeConnection();
+								ssh.closeConnection();
 							} catch (IOException e) {}
 							// terminate instance
 							monitor.suspendServer(id);
@@ -125,7 +126,7 @@ public class StartUpMonitor {
 		if (imgRef != null && flavorRef != null) {
 			// start instance, the instance will be named mX with X being in [2,7]
 			for(ServerConnection s : managedInstances){
-				if(s.getServer().getStatus().equals("SUSPENDED")){
+				if(s.getServer()!=null && s.getServer().getStatus().equals("SUSPENDED")){
 					final ServerConnection con = s;
 					
 					new Thread(new Runnable() {

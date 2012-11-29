@@ -3,6 +3,8 @@ package aic.monitor;
 import java.io.IOException;
 import java.util.List;
 
+import org.openstack.nova.model.Server;
+
 public class SimpleStrategy implements Strategy {
 	private int lastDecision = 0;
 	
@@ -21,9 +23,11 @@ public class SimpleStrategy implements Strategy {
 		double sum = 0;
 		int count = 0;
 		
-		for(ServerConnection s : servers) {
-			if(s.getServer().getStatus().equals("ACTIVE") && s.getSsh()!=null){
-				sum += s.getSsh().getLoadAvg();
+		for(ServerConnection con : servers) {
+			Server server = con.getServer();
+			SSHMonitor ssh = con.getSsh();
+			if(server!=null && ssh!=null && server.getStatus().equals("ACTIVE")){
+				sum += ssh.getLoadAvg();
 				count++;
 			}
 		}
