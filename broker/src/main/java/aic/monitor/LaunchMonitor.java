@@ -17,6 +17,7 @@ import org.openstack.nova.NovaClient;
 import org.openstack.nova.api.FlavorsCore;
 import org.openstack.nova.api.ImagesCore;
 import org.openstack.nova.api.ServersCore;
+import org.openstack.nova.api.extensions.SnapshotsExtension;
 import org.openstack.nova.model.Flavor;
 import org.openstack.nova.model.Flavors;
 import org.openstack.nova.model.Image;
@@ -24,6 +25,7 @@ import org.openstack.nova.model.Images;
 import org.openstack.nova.model.Server;
 import org.openstack.nova.model.ServerForCreate;
 import org.openstack.nova.model.Servers;
+import org.openstack.nova.model.Snapshots;
 
 public class LaunchMonitor {
 
@@ -89,6 +91,10 @@ public class LaunchMonitor {
 	public Images getImages() {
 		return this.getNovaClient().execute(ImagesCore.listImages());
 	}
+	
+	public Snapshots getSnapshots(){
+		return this.getNovaClient().execute(SnapshotsExtension.listSnapshots());
+	}
 
 	/**
 	 * @param id Server id
@@ -110,6 +116,14 @@ public class LaunchMonitor {
 				.compareTo(serverAccess.getToken().getExpires().getTime()) == 1;
 	}
 
+	/**
+	 * Returns NovaClient instance.
+	 * 
+	 * Checks whether is there access to server and token isn't expired yet.
+	 * Otherwise auth on server through KeystoneClient with default credentials.
+	 * 
+	 * @return Instance of NovaClient
+	 */
 	private NovaClient getNovaClient() {
 		if (serverAccess == null || isTokenExpired()) {
 			KeystoneClient keystone = new KeystoneClient(KEYSTONE_AUTH_URL);
@@ -151,6 +165,9 @@ public class LaunchMonitor {
 	}
 
 	/**
+	 * It's not a usable method. It's just example,
+	 * how to use LaunchMonitor.
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -176,7 +193,7 @@ public class LaunchMonitor {
 
 		// print all images
 		for (Image image : monitor.getImages()) {
-			if (image.getName().equals("Ubuntu 12.10 amd64")) {
+			if (image.getName().equals("mongo-fresh")) {
 				imgRef = image.getLinks().get(0).getHref();
 			}
 			System.out.println(image);
