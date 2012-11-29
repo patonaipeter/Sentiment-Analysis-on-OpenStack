@@ -15,8 +15,8 @@ import aic.monitor.util.PropertyManager;
 
 public class StartUpMonitor {
 	
-	private static final String FLAVORNAME = "";
-	private static final String IMAGENAME = "";
+	private static final String FLAVORNAME = "m1.tiny";
+	private static final String IMAGENAME = "Ubuntu 12.10 amd64";
 	/**
 	 * Placeholder for later, we can use this variable to externally terminate the run-loop.
 	 */
