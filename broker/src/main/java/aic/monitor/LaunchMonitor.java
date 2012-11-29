@@ -17,7 +17,7 @@ import org.openstack.nova.NovaClient;
 import org.openstack.nova.api.FlavorsCore;
 import org.openstack.nova.api.ImagesCore;
 import org.openstack.nova.api.ServersCore;
-import org.openstack.nova.api.extensions.SnapshotsExtension;
+import org.openstack.nova.api.extensions.VolumesExtension;
 import org.openstack.nova.model.Flavor;
 import org.openstack.nova.model.Flavors;
 import org.openstack.nova.model.Image;
@@ -25,7 +25,11 @@ import org.openstack.nova.model.Images;
 import org.openstack.nova.model.Server;
 import org.openstack.nova.model.ServerForCreate;
 import org.openstack.nova.model.Servers;
-import org.openstack.nova.model.Snapshots;
+import org.openstack.nova.model.Volume;
+import org.openstack.nova.model.VolumeForCreate;
+import org.openstack.nova.model.Volumes;
+
+import aic.openstack.SuspendResumeServerExtension;
 
 public class LaunchMonitor {
 
@@ -35,25 +39,30 @@ public class LaunchMonitor {
 	private String KEY_NAME;
 	private String SECURITY_GROUP_NAME;
 	private Access serverAccess = null;
-	
-	public LaunchMonitor(Properties p){
+
+	public LaunchMonitor(Properties p) {
 		this.KEYSTONE_AUTH_URL = p.getProperty("openstack_url");
 		this.KEYSTONE_USERNAME = p.getProperty("openstack_username");
 		this.KEYSTONE_PASSWORD = p.getProperty("openstack_password");
 		this.KEY_NAME = p.getProperty("openstack_key");
 		this.SECURITY_GROUP_NAME = p.getProperty("openstack_security_group");
 	}
-	
-	public LaunchMonitor(String url,
-			String username,
-			String password,
-			String key,
-			String security_group){
+
+	public LaunchMonitor(String url, String username, String password,
+			String key, String security_group) {
 		this.KEYSTONE_AUTH_URL = url;
 		this.KEYSTONE_USERNAME = username;
 		this.KEYSTONE_PASSWORD = password;
 		this.KEY_NAME = key;
 		this.SECURITY_GROUP_NAME = security_group;
+	}
+
+	public void suspendServer(String id) {
+		this.getNovaClient().execute(SuspendResumeServerExtension.suspend(id));
+	}
+
+	public void resumeServer(String id) {
+		this.getNovaClient().execute(SuspendResumeServerExtension.resume(id));
 	}
 
 	public Server createServer(String serverName, String flavorRef,
@@ -83,6 +92,17 @@ public class LaunchMonitor {
 	public Flavors getFlavors() {
 		return this.getNovaClient().execute(FlavorsCore.listFlavors());
 	}
+	
+	public Flavor getFlavor(String id) {
+		for (Flavor flavor : this.getFlavors()) {
+			if (flavor.getId().equals(id)) {
+				System.out.println(flavor);
+				return flavor;
+			}
+		}
+
+		return null;
+	}
 
 	public Servers getServers() {
 		return this.getNovaClient().execute(ServersCore.listServers(true));
@@ -92,12 +112,63 @@ public class LaunchMonitor {
 		return this.getNovaClient().execute(ImagesCore.listImages());
 	}
 	
-	public Snapshots getSnapshots(){
-		return this.getNovaClient().execute(SnapshotsExtension.listSnapshots());
+	public Image getImage(String id) {
+		for (Image image : this.getImages()) {
+			if (image.getId().equals(id)) {
+				System.out.println(image);
+				return image;
+			}
+		}
+
+		return null;
+	}
+
+	public Volumes getVolumes() {
+		return this.getNovaClient().execute(VolumesExtension.listVolumes());
+	}
+
+	public Volume getVolume(String id) {
+		for (Volume volume : this.getVolumes()) {
+			if (volume.getId().equals(id)) {
+				System.out.println(volume);
+				return volume;
+			}
+		}
+
+		return null;
+	}
+
+	public void attachVolume(String serverId, String volumeId, String device) {
+		this.getNovaClient().execute(
+				VolumesExtension.attachVolume(serverId, volumeId, device));
+	}
+
+	public void detachVolume(String serverId, String volumeId) {
+		this.getNovaClient().execute(
+				VolumesExtension.detachVolume(serverId, volumeId));
+	}
+
+	public Volume createVolume(String serverId) {
+		// define volume
+		VolumeForCreate volumeForCreate = new VolumeForCreate();
+		// TODO: init volume properties
+
+		// create volume
+		Volume volume = this.getNovaClient().execute(
+				VolumesExtension.createVolume(volumeForCreate));
+
+		System.out.println(volume);
+
+		return volume;
+	}
+
+	public void deleteVolume(String id) {
+		this.getNovaClient().execute(VolumesExtension.deleteVolume(id));
 	}
 
 	/**
-	 * @param id Server id
+	 * @param id
+	 *            Server id
 	 * @return Returns Server with @id, if it exists. Otherwise null.
 	 */
 	public Server getServer(String id) {
@@ -116,14 +187,6 @@ public class LaunchMonitor {
 				.compareTo(serverAccess.getToken().getExpires().getTime()) == 1;
 	}
 
-	/**
-	 * Returns NovaClient instance.
-	 * 
-	 * Checks whether is there access to server and token isn't expired yet.
-	 * Otherwise auth on server through KeystoneClient with default credentials.
-	 * 
-	 * @return Instance of NovaClient
-	 */
 	private NovaClient getNovaClient() {
 		if (serverAccess == null || isTokenExpired()) {
 			KeystoneClient keystone = new KeystoneClient(KEYSTONE_AUTH_URL);
@@ -165,8 +228,7 @@ public class LaunchMonitor {
 	}
 
 	/**
-	 * It's not a usable method. It's just example,
-	 * how to use LaunchMonitor.
+	 * It's not a usable method. It's just example, how to use LaunchMonitor.
 	 * 
 	 * @param args
 	 */
@@ -176,8 +238,8 @@ public class LaunchMonitor {
 			properties.loadFromXML(new FileInputStream("properties.xml"));
 		} catch (Exception e) {
 			e.printStackTrace();
-		} 
-		
+		}
+
 		// TODO Auto-generated method stub
 		LaunchMonitor monitor = new LaunchMonitor(properties);
 
@@ -186,14 +248,14 @@ public class LaunchMonitor {
 
 		// print all flavors
 		for (Flavor flavor : monitor.getFlavors()) {
-			if (flavor.getName().equals("m1.tiny.win"))
+			if (flavor.getName().equals("m1.tiny"))
 				flavorRef = flavor.getLinks().get(0).getHref();
 			System.out.println(flavor);
 		}
 
 		// print all images
 		for (Image image : monitor.getImages()) {
-			if (image.getName().equals("mongo-fresh")) {
+			if (image.getName().equals("Ubuntu 12.10 amd64")) {
 				imgRef = image.getLinks().get(0).getHref();
 			}
 			System.out.println(image);
@@ -219,11 +281,50 @@ public class LaunchMonitor {
 				isActive = monitor.getServer(server.getId()).getStatus()
 						.equals("ACTIVE");
 			}
+			// suspend instance
+			monitor.suspendServer(server.getId());
+			// waiting for SUSPEND state
+			Boolean isSuspended = false;
+			while (!isSuspended) {
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				isSuspended = monitor.getServer(server.getId()).getStatus()
+						.equals("SUSPENDED");
+			}
+			// resume instance
+			monitor.resumeServer(server.getId());
+			// waiting for RESUME state
+			Boolean isResumed = false;
+			while (!isResumed) {
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				isResumed = monitor.getServer(server.getId()).getStatus()
+						.equals("ACTIVE");
+			}
 			// terminate instance
 			monitor.terminateServer(server.getId());
+			
+			while (monitor.getServer(server.getId()) != null){
+				System.out.printf("Waiting for %s being terminated...", server.getId());
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			System.out.printf("Server %s has been terminated succesfully.", server.getId());
 		}
 
 		// stop started instance
 
 	}
+
 }
+

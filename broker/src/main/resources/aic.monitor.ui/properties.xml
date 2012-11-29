@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>Monitor</comment>
+<entry key="openstack_url">http://openstack.infosys.tuwien.ac.at:5000/v2.0</entry>
+<entry key="openstack_username">aic12w04</entry>
+<entry key="openstack_password">Sah9meec</entry>
+<entry key="openstack_key">aic12</entry>
+<entry key="openstack_security_group">default</entry>
+<entry key="monitor_sleep_time">5000</entry>
+</properties>

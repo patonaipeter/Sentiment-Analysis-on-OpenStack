@@ -1,4 +1,4 @@
-package aic.monitor.properties;
+package aic.monitor.util;
 
 import java.io.FileInputStream;
 import java.util.Properties;
