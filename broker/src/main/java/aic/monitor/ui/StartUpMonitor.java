@@ -164,6 +164,7 @@ public class StartUpMonitor {
 							con.setServer(s);
 						}
 					});
+					break;
 				}
 			}
 		}
