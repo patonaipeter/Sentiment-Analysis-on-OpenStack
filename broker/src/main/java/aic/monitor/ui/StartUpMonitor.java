@@ -68,7 +68,8 @@ public class StartUpMonitor {
 		int active = 0;
 		
 		for(ServerConnection s : managedInstances){
-			if(s.getServer()!=null && s.getServer().getStatus().equals("ACTIVE")){
+			Server server = s.getServer();
+			if(server!=null && server.getStatus().equals("ACTIVE")){
 				active++;
 			}
 		}
@@ -77,12 +78,14 @@ public class StartUpMonitor {
 			
 			
 			for(ServerConnection s : managedInstances){
-				if(s.getServer()!=null && s.getServer().getStatus().equals("ACTIVE") && !s.isPrimary()){
+				Server tmp = s.getServer();
+				if(tmp!=null && tmp.getStatus().equals("ACTIVE") && !s.isPrimary()){
 					final ServerConnection con = s;
-					final Server server = con.getServer();
+					final Server server = tmp;
 					final SSHMonitor ssh = con.getSsh();
-					con.setSsh(null);
 					con.setServer(null);
+					con.setSsh(null);
+					
 					
 					new Thread(new Runnable(){
 						public void run(){
@@ -126,12 +129,16 @@ public class StartUpMonitor {
 		if (imgRef != null && flavorRef != null) {
 			// start instance, the instance will be named mX with X being in [2,7]
 			for(ServerConnection s : managedInstances){
-				if(s.getServer()!=null && s.getServer().getStatus().equals("SUSPENDED")){
+				Server tmp = s.getServer();
+				if(tmp!=null && tmp.getStatus().equals("SUSPENDED")){
 					final ServerConnection con = s;
+					final Server server = tmp;
+					con.setServer(null);
+					con.setSsh(null);
 					
 					new Thread(new Runnable() {
 						public void run() {
-							String id = con.getServer().getId();
+							String id = server.getId();
 							monitor.resumeServer(id);
 							// waiting for ACTIVE state
 							Boolean isActive = false;
@@ -240,7 +247,7 @@ public class StartUpMonitor {
 			 */
 			
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(strategy.getSleepTime());
 			} catch (InterruptedException e) {}
 		}
 	}

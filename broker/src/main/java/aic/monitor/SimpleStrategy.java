@@ -10,6 +10,10 @@ public class SimpleStrategy implements Strategy {
 	
 	@Override
 	public int getSleepTime() {
+		if(lastDecision!=0){
+			//give it some time
+			return 12000;
+		}
 		return 2000;
 	}
 
