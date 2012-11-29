@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -58,24 +60,42 @@ public class SimpleTest {
 		return out.toArray(new String[0]);
 	}
 	
-
-	public double analyseSentiment(String company) {
+	public double analyseSentiment(String searchString) {
 		BasicDBObject dbo = new BasicDBObject();
-		dbo.put("keywords", getKeywords(company));
-		//dbo.put("text", Pattern.compile(".*"+company+".*"));
-		//DBCursor cursor = tweetsCollection.find(dbo);
 		
-		
-        //try out map/reduce
-		String map = "function(){emit(null,{sentiment: this.sentiment});};";
-		String reduce = "function(key,values){" + "var result = 0.0;"
-				+ "values.forEach(function(value) {"
-				+ "  result += value.sentiment;" + "});"
-				+ "return { sentiment: result/values.length };" + "};";
-		MapReduceOutput out = tweetsCollection.mapReduce(map, reduce, null,
-				MapReduceCommand.OutputType.INLINE, dbo);
-		return (Double) ((DBObject) out.results().iterator().next()
-				.get("value")).get("sentiment");
+		String[] keywords=getKeywords(searchString);
+		if(keywords.length>0){
+			if(keywords.length==1){
+				dbo.put("keywords", keywords[0]);
+			}else{
+				ArrayList<BasicDBObject> andList = new ArrayList<BasicDBObject>();
+				for(String keyword : keywords){
+					andList.add(new BasicDBObject("keywords", keyword));
+				}
+				dbo.put("$and", andList);
+			}
+			
+	        //try out map/reduce
+			String map = "function(){emit(null,{sentiment: this.sentiment});};";
+			String reduce = "function(key,values){" + "var result = 0.0;"
+					+ "values.forEach(function(value) {"
+					+ "  result += value.sentiment;" + "});"
+					+ "return { sentiment: result/values.length };" + "};";
+			MapReduceOutput out = tweetsCollection.mapReduce(map, reduce, null,
+					MapReduceCommand.OutputType.INLINE, dbo);
+			if(out!=null){
+				Iterable<DBObject> results=out.results();
+				if(results!=null){
+					Iterator<DBObject> it=results.iterator();
+					if(it.hasNext()){
+						return (Double) ((DBObject) it.next().get("value")).get("sentiment");
+					}
+				}
+			}
+
+		}
+			
+		return 0.0;
 	}
 	
 	public static void main(String[] args) throws Exception {
