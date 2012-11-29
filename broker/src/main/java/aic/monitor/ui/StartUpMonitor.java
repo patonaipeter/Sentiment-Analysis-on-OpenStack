@@ -34,7 +34,7 @@ public class StartUpMonitor {
 	/*
 	 * adds the server to the mongodb shard
 	 */
-	public void addToShard(Server s){
+	public void addShard(Server s){
 		try {
 			Runtime.getRuntime().exec("mongo tweets --eval \"sh.addShard('" + s.getAccessIPv4() + ":27018')\"");
 		} catch (IOException e) {
@@ -45,15 +45,15 @@ public class StartUpMonitor {
 	/*
 	 * removes the server from the mongodb shard
 	 */
-	public void removeFromShard(Server s){
+	public void removeShard(Server s){
 		try {
 			Runtime.getRuntime().exec("mongo tweets --eval \"use admin;db.runCommand( {removeShard: '" + s.getAccessIPv4() + ":27018'} )\"");
 			Process child=null;
 			do{
 				Thread.sleep(10000);
-				child=Runtime.getRuntime().exec("mongo tweets --eval \"sh.status()\" | grep -q -i draining");
+				child=Runtime.getRuntime().exec("mongo tweets --eval \"use admin;db.runCommand( {removeShard: '" + s.getAccessIPv4() + ":27018'} )\" | grep -q -i completed");
 				child.waitFor();
-			}while(child.exitValue()==0);
+			}while(child.exitValue()!=0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -82,7 +82,7 @@ public class StartUpMonitor {
 					
 					new Thread(new Runnable(){
 						public void run(){
-							removeFromShard(con.getServer());
+							removeShard(con.getServer());
 							//close ssh connection
 							try {
 								SSHMonitor m = con.getSsh();
@@ -140,7 +140,7 @@ public class StartUpMonitor {
 										.equals("ACTIVE");
 							}
 							Server s = monitor.getServer(con.getServer().getId());
-							addToShard(s);
+							addShard(s);
 							
 							SSHMonitor m = null;
 							try {
