@@ -160,8 +160,8 @@ public class StartUpMonitor {
 									e1.printStackTrace();
 								}
 							}
-							con.setServer(s);
 							con.setSsh(m);
+							con.setServer(s);
 						}
 					});
 				}
