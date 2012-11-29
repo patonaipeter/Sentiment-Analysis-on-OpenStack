@@ -82,7 +82,10 @@ public class StartUpMonitor {
 					
 					new Thread(new Runnable(){
 						public void run(){
-							removeShard(con.getServer());
+							Server server = con.getServer();
+							String id = server.getId();
+							
+							removeShard(server);
 							//close ssh connection
 							try {
 								SSHMonitor m = con.getSsh();
@@ -90,7 +93,7 @@ public class StartUpMonitor {
 								m.closeConnection();
 							} catch (IOException e) {}
 							// terminate instance
-							monitor.suspendServer(con.getServer().getId());
+							monitor.suspendServer(id);
 							
 							// waiting for SUSPENDED state
 							Boolean isSuspended = false;
@@ -100,10 +103,10 @@ public class StartUpMonitor {
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
-								isSuspended = monitor.getServer(con.getServer().getId()).getStatus()
+								isSuspended = monitor.getServer(id).getStatus()
 										.equals("SUSPENDED");
 							}
-							Server s = monitor.getServer(con.getServer().getId());
+							Server s = monitor.getServer(id);
 							con.setServer(s);
 						}
 					});
@@ -127,7 +130,8 @@ public class StartUpMonitor {
 					
 					new Thread(new Runnable() {
 						public void run() {
-							monitor.resumeServer(con.getServer().getId());
+							String id = con.getServer().getId();
+							monitor.resumeServer(id);
 							// waiting for ACTIVE state
 							Boolean isActive = false;
 							while (!isActive) {
@@ -136,10 +140,10 @@ public class StartUpMonitor {
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
-								isActive = monitor.getServer(con.getServer().getId()).getStatus()
+								isActive = monitor.getServer(id).getStatus()
 										.equals("ACTIVE");
 							}
-							Server s = monitor.getServer(con.getServer().getId());
+							Server s = monitor.getServer(id);
 							addShard(s);
 							
 							SSHMonitor m = null;
