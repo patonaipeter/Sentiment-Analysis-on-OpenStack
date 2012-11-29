@@ -14,18 +14,12 @@ import aic.monitor.Strategy;
 import aic.monitor.util.PropertyManager;
 
 public class StartUpMonitor {
-	
-	private static final String FLAVORNAME = "m1.tiny";
-	private static final String IMAGENAME = "Ubuntu 12.10 amd64";
 	/**
 	 * Placeholder for later, we can use this variable to externally terminate the run-loop.
 	 */
 	private volatile boolean running = true;
-
 	private ArrayList<ServerConnection> managedInstances = new ArrayList<ServerConnection>();
 	final private LaunchMonitor monitor;
-	private String flavorRef;
-	private String imgRef;
 	private Strategy strategy = new SimpleStrategy();
 	
 	public StartUpMonitor(Properties properties){
@@ -131,67 +125,57 @@ public class StartUpMonitor {
 	 * be active, it then adds the resulting server to readyInstances
 	 */
 	public void resumeInstance() {
-		if (imgRef != null && flavorRef != null) {
-			// start instance, the instance will be named mX with X being in [2,7]
-			for(ServerConnection s : managedInstances){
-				Server tmp = s.getServer();
-				if(tmp!=null && tmp.getStatus().equals("SUSPENDED")){
-					final ServerConnection con = s;
-					final Server server = tmp;
-					con.setServer(null);
-					con.setSsh(null);
-					
-					new Thread(new Runnable() {
-						public void run() {
-							String id = server.getId();
-							monitor.resumeServer(id);
-							// waiting for ACTIVE state
-							Boolean isActive = false;
-							while (!isActive) {
-								try {
-									Thread.sleep(10000);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-								isActive = monitor.getServer(id).getStatus()
-										.equals("ACTIVE");
+		// start instance, the instance will be named mX with X being in [2,7]
+		for(ServerConnection s : managedInstances){
+			Server tmp = s.getServer();
+			if(tmp!=null && tmp.getStatus().equals("SUSPENDED")){
+				final ServerConnection con = s;
+				final Server server = tmp;
+				con.setServer(null);
+				con.setSsh(null);
+				
+				new Thread(new Runnable() {
+					public void run() {
+						String id = server.getId();
+						monitor.resumeServer(id);
+						// waiting for ACTIVE state
+						Boolean isActive = false;
+						while (!isActive) {
+							try {
+								Thread.sleep(10000);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
 							}
-							Server s = monitor.getServer(id);
-							addShard(s);
+							isActive = monitor.getServer(id).getStatus()
+									.equals("ACTIVE");
+						}
+						Server s = monitor.getServer(id);
+						addShard(s);
+						
+						SSHMonitor m = null;
+						try {
+							m=new SSHMonitor("ubuntu",s.getAccessIPv4());
+						} catch (IOException e) {
+							//try again after 10 seconds maybe ssh server is not ready yet
+							try {Thread.sleep(10000);} catch (InterruptedException e1) {}
 							
-							SSHMonitor m = null;
 							try {
 								m=new SSHMonitor("ubuntu",s.getAccessIPv4());
-							} catch (IOException e) {
-								//try again after 10 seconds maybe ssh server is not ready yet
-								try {Thread.sleep(10000);} catch (InterruptedException e1) {}
-								
-								try {
-									m=new SSHMonitor("ubuntu",s.getAccessIPv4());
-								} catch (IOException e1) {
-									//its no use the server is not reachable
-									e1.printStackTrace();
-								}
+							} catch (IOException e1) {
+								//its no use the server is not reachable
+								e1.printStackTrace();
 							}
-							con.setSsh(m);
-							con.setServer(s);
 						}
-					});
-					break;
-				}
+						con.setSsh(m);
+						con.setServer(s);
+					}
+				});
+				break;
 			}
 		}
 	}
 
 	public void start() throws IOException{
-		// set flavorRef
-		flavorRef = monitor.getFlavor(FLAVORNAME).getLinks().get(0).getHref();
-		System.out.println(flavorRef);
-		
-		// setImageRef
-		imgRef = monitor.getImage(IMAGENAME).getLinks().get(0).getHref();
-		System.out.println(imgRef);
-		
 		//keep a list of all managed instances
 		for(Server server : monitor.getServers()) {
 			if(server.getInstanceName().matches("m\\d")){
