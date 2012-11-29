@@ -10,6 +10,7 @@ import org.openstack.nova.model.Image;
 import org.openstack.nova.model.Server;
 
 import aic.monitor.*;
+import aic.monitor.util.PropertyManager;
 
 public class StartUpMonitor {
 	/**
@@ -253,14 +254,8 @@ public class StartUpMonitor {
 	}
 
 	public static void main(String[] args) throws IOException {
-		Properties properties = new Properties();
-		try {
-			properties.loadFromXML(new FileInputStream("properties.xml"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		StartUpMonitor m = new StartUpMonitor(properties);
+		StartUpMonitor m = new StartUpMonitor(
+				PropertyManager.getInstance().getProperties());
 		m.start();
 	}
 }
