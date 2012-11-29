@@ -92,6 +92,17 @@ public class LaunchMonitor {
 	public Flavors getFlavors() {
 		return this.getNovaClient().execute(FlavorsCore.listFlavors());
 	}
+	
+	public Flavor getFlavor(String id) {
+		for (Flavor flavor : this.getFlavors()) {
+			if (flavor.getId().equals(id)) {
+				System.out.println(flavor);
+				return flavor;
+			}
+		}
+
+		return null;
+	}
 
 	public Servers getServers() {
 		return this.getNovaClient().execute(ServersCore.listServers(true));
@@ -99,6 +110,17 @@ public class LaunchMonitor {
 
 	public Images getImages() {
 		return this.getNovaClient().execute(ImagesCore.listImages());
+	}
+	
+	public Image getImage(String id) {
+		for (Image image : this.getImages()) {
+			if (image.getId().equals(id)) {
+				System.out.println(image);
+				return image;
+			}
+		}
+
+		return null;
 	}
 
 	public Volumes getVolumes() {

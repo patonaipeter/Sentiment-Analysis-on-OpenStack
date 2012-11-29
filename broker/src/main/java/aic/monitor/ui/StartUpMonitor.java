@@ -13,6 +13,9 @@ import aic.monitor.*;
 import aic.monitor.util.PropertyManager;
 
 public class StartUpMonitor {
+	
+	private static final String FLAVORNAME = "";
+	private static final String IMAGENAME = "";
 	/**
 	 * Placeholder for later, we can use this variable to externally terminate the run-loop.
 	 */
@@ -180,24 +183,16 @@ public class StartUpMonitor {
 	}
 
 	public void start() throws IOException{
-		// print all flavors
-		for (Flavor flavor : monitor.getFlavors()) {
-			if (flavor.getName().equals("m1.tiny"))
-				flavorRef = flavor.getLinks().get(0).getHref();
-			System.out.println(flavor);
-		}
-
-		// print all images
-		for (Image image : monitor.getImages()) {
-			if (image.getName().equals("Ubuntu 12.10 amd64")) {
-				imgRef = image.getLinks().get(0).getHref();
-			}
-			System.out.println(image);
-		}
+		// set flavorRef
+		flavorRef = monitor.getFlavor(FLAVORNAME).getLinks().get(0).getHref();
+		System.out.println(flavorRef);
+		
+		// setImageRef
+		imgRef = monitor.getImage(IMAGENAME).getLinks().get(0).getHref();
+		System.out.println(imgRef);
 		
 		//keep a list of all managed instances
 		for(Server server : monitor.getServers()) {
-			
 			if(server.getInstanceName().matches("m\\d")){
 				//primary server is never shut down
 				boolean primary = false;
