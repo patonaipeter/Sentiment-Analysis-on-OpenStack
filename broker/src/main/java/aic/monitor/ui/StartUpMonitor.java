@@ -2,15 +2,14 @@ package aic.monitor.ui;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import org.openstack.nova.model.Flavor;
 import org.openstack.nova.model.Image;
 import org.openstack.nova.model.Server;
 
-import aic.monitor.LaunchMonitor;
-import aic.monitor.SSHMonitor;
+import aic.monitor.*;
 
 public class StartUpMonitor {
 	/**
@@ -18,85 +17,18 @@ public class StartUpMonitor {
 	 */
 	private volatile boolean running = true;
 
-	private Hashtable<Server, SSHMonitor> managedInstances = new Hashtable<Server, SSHMonitor>();
-
-	//instances that are newly created and ready to be included into managedInstances
-	final private Hashtable<Server, SSHMonitor> readyInstances=new Hashtable<Server, SSHMonitor>();
+	private ArrayList<ServerConnection> managedInstances = new ArrayList<ServerConnection>();
 	final private LaunchMonitor monitor;
 	private String flavorRef;
 	private String imgRef;
-	//used to generate names for the instances
-	private int imageNumber=2;
+	private Strategy strategy = new SimpleStrategy();
 	
 	public StartUpMonitor(Properties properties){
 		monitor = new LaunchMonitor(properties);
 	}
 	
-	//for now it calculates a simple mean value
-	//TODO use a Strategy object, that receives a List<SSHMonitor> as input
-	private double getCloudMetric() throws IOException {
-		double sum = 0;
-		for(SSHMonitor monitor : managedInstances.values()) {
-		//for(SSHMonitor monitor : sshConnections) {
-			sum += monitor.getLoadAvg();
-		}
-		return sum / managedInstances.size();
-	}
-	
 	public void stop() {
 		running = false;
-	}
-	
-	/*
-	 * creates a new instance and starts a thread that waits for it to
-	 * be active, it then adds the resulting server to readyInstances
-	 */
-	public void startNewInstance() {
-		if (imgRef != null && flavorRef != null) {
-			// start instance, the instance will be named mX with X being in [2,7]
-			final Server server = monitor.createServer("m" + imageNumber++,
-					flavorRef, imgRef);
-
-			new Thread(new Runnable() {
-				public void run() {
-					// waiting for ACTIVE state
-					Boolean isActive = false;
-					while (!isActive) {
-						try {
-							Thread.sleep(10000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						isActive = monitor.getServer(server.getId()).getStatus()
-								.equals("ACTIVE");
-					}
-					Server s = monitor.getServer(server.getId());
-					
-					addToShard(s);
-					
-					
-					try {
-						synchronized(readyInstances){
-							readyInstances.put(s, new SSHMonitor("ubuntu",s.getAccessIPv4()));
-						}
-					} catch (IOException e) {
-						//try again after 10 seconds maybe ssh server is not ready yet
-						try {Thread.sleep(10000);} catch (InterruptedException e1) {}
-						
-						try {
-							synchronized(readyInstances){
-								readyInstances.put(s, new SSHMonitor("ubuntu",s.getAccessIPv4()));
-							}
-						} catch (IOException e1) {
-							//its no use the server is not reachable
-							e1.printStackTrace();
-						}
-					}
-					
-				}
-			});
-
-		}
 	}
 	
 	/*
@@ -130,24 +62,107 @@ public class StartUpMonitor {
 	/*
 	 * it immediatly removes the top server from managesInstances and starts a thread
 	 * to do the rest since removeFromShard could take some time
-	 * TODO suspend instead of terminate
 	 */
-	public void terminateInstance() {
-		final Server server = managedInstances.keys().nextElement();
-		final SSHMonitor monitor = managedInstances.get(server);
-		managedInstances.remove(server);
+	public void suspendInstance() {
+		int reserve = strategy.getReserveServers();
+		int active = 0;
 		
-		new Thread(new Runnable(){
-			public void run(){
-				removeFromShard(server);
-				//close ssh connection
-				try {
-					monitor.closeConnection();
-				} catch (IOException e) {}
-				// terminate instance
-				StartUpMonitor.this.monitor.terminateServer(server.getId());
+		for(ServerConnection s : managedInstances){
+			if(s.getServer().getStatus().equals("ACTIVE")){
+				active++;
 			}
-		});
+		}
+		
+		if(reserve <= active){
+			
+			
+			for(ServerConnection s : managedInstances){
+				if(s.getServer().getStatus().equals("ACTIVE") && !s.isPrimary()){
+					final ServerConnection con = s;
+					
+					new Thread(new Runnable(){
+						public void run(){
+							removeFromShard(con.getServer());
+							//close ssh connection
+							try {
+								SSHMonitor m = con.getSsh();
+								con.setSsh(null);
+								m.closeConnection();
+							} catch (IOException e) {}
+							// terminate instance
+							monitor.suspendServer(con.getServer().getId());
+							
+							// waiting for SUSPENDED state
+							Boolean isSuspended = false;
+							while (!isSuspended) {
+								try {
+									Thread.sleep(10000);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								isSuspended = monitor.getServer(con.getServer().getId()).getStatus()
+										.equals("SUSPENDED");
+							}
+							Server s = monitor.getServer(con.getServer().getId());
+							con.setServer(s);
+						}
+					});
+					
+					break;
+				}
+			}
+		}
+	}
+	
+	/*
+	 * creates a new instance and starts a thread that waits for it to
+	 * be active, it then adds the resulting server to readyInstances
+	 */
+	public void resumeInstance() {
+		if (imgRef != null && flavorRef != null) {
+			// start instance, the instance will be named mX with X being in [2,7]
+			for(ServerConnection s : managedInstances){
+				if(s.getServer().getStatus().equals("SUSPENDED")){
+					final ServerConnection con = s;
+					
+					new Thread(new Runnable() {
+						public void run() {
+							monitor.resumeServer(con.getServer().getId());
+							// waiting for ACTIVE state
+							Boolean isActive = false;
+							while (!isActive) {
+								try {
+									Thread.sleep(10000);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								isActive = monitor.getServer(con.getServer().getId()).getStatus()
+										.equals("ACTIVE");
+							}
+							Server s = monitor.getServer(con.getServer().getId());
+							addToShard(s);
+							
+							SSHMonitor m = null;
+							try {
+								m=new SSHMonitor("ubuntu",s.getAccessIPv4());
+							} catch (IOException e) {
+								//try again after 10 seconds maybe ssh server is not ready yet
+								try {Thread.sleep(10000);} catch (InterruptedException e1) {}
+								
+								try {
+									m=new SSHMonitor("ubuntu",s.getAccessIPv4());
+								} catch (IOException e1) {
+									//its no use the server is not reachable
+									e1.printStackTrace();
+								}
+							}
+							con.setServer(s);
+							con.setSsh(m);
+						}
+					});
+				}
+			}
+		}
 	}
 
 	public void start() throws IOException{
@@ -168,20 +183,18 @@ public class StartUpMonitor {
 		
 		//keep a list of all managed instances
 		for(Server server : monitor.getServers()) {
-			//exclude instance with name 'website'
-			if(server.getInstanceName().equals("website")){
-				continue;
+			
+			if(server.getInstanceName().matches("m\\d")){
+				//primary server is never shut down
+				boolean primary = false;
+				if(server.getInstanceName().equals("m1")){
+					primary = true;
+				}
+				
+				managedInstances.add(new ServerConnection(server,new SSHMonitor("ubuntu",server.getAccessIPv4()),primary));
 			}
-			//exclude m1 from the managed instances since it has
-			//to always be running
-			if(!server.getInstanceName().equals("m1")){
-				continue;
-			}
-			final SSHMonitor monitor = new SSHMonitor("ubuntu",server.getAccessIPv4()); 
-			managedInstances.put(server, monitor);
 		}
 		
-		imageNumber += managedInstances.size();
 
 		while(running) {
 			// The broker needs to perform a few steps in order to determine the current load
@@ -190,19 +203,13 @@ public class StartUpMonitor {
 			//1. Get the information of all running instances
 			//   We need to manage a list of all instances (running and stopped), then we poll the active ones
 			//   and retrieve the data from them, using the SshMonitor.
-			synchronized(readyInstances){
-				managedInstances.putAll(readyInstances);
-				readyInstances.clear();
-			}
-
-			double loadValue = getCloudMetric();
-			
-			if(loadValue>0.9){
+			int decision = strategy.decide(managedInstances);
+			if(decision>0){
 				//start new instance
-				startNewInstance();
-			}else if(loadValue<0.2 && managedInstances.size()>0){
+				resumeInstance();
+			}else if(decision<0){
 				//shut instance down
-				terminateInstance();
+				suspendInstance();
 			}
 
 			//2. Evaluate the load based on the data that was returned by the SshMonitor. It will be best to
