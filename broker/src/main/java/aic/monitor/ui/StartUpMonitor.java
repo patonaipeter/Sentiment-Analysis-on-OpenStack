@@ -35,7 +35,7 @@ public class StartUpMonitor {
 	 */
 	public void addShard(Server s){
 		try {
-			Runtime.getRuntime().exec("mongo tweets --eval \"sh.addShard('" + getServerIp(s) + ":27018')\"");
+			Runtime.getRuntime().exec("mongo admin --eval \"sh.addShard('" + getServerIp(s) + ":27018')\"");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -46,11 +46,11 @@ public class StartUpMonitor {
 	 */
 	public void removeShard(Server s){
 		try {
-			Runtime.getRuntime().exec("mongo tweets --eval \"use admin;db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} )\"");
+			Runtime.getRuntime().exec("mongo admin --eval \"db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} )\"");
 			Process child=null;
 			do{
 				Thread.sleep(10000);
-				child=Runtime.getRuntime().exec("mongo tweets --eval \"use admin;db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} )\" | grep -q -i completed");
+				child=Runtime.getRuntime().exec("mongo admin --eval \"printjson(db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} ))\" | grep -q -i completed");
 				child.waitFor();
 			}while(child.exitValue()!=0);
 		} catch (Exception e) {
