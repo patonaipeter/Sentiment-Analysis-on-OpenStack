@@ -4,6 +4,13 @@ import java.io.IOException;
 import java.util.List;
 
 public interface Strategy {
+	public static final int SERVER_MAX_COUNT = 8;
+	/*
+	 * VM are available for being calculated in measurements
+	 * only after (in avg) 3 min (time for shard allocation).
+	 */
+	public static final int VM_ALLOCATE_TIME = 3*60000;
+	
 	//returns the time in milliseconds that the thread should sleep
 	int getSleepTime();
 	

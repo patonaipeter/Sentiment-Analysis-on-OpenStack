@@ -73,9 +73,7 @@ public class StartUpMonitor {
 			}
 		}
 		
-		if(reserve <= active){
-			
-			
+		if(reserve < active){
 			for(ServerConnection s : managedInstances){
 				Server tmp = s.getServer();
 				if(tmp!=null && tmp.getStatus().equals("ACTIVE") && !s.isPrimary()){

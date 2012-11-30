@@ -29,8 +29,8 @@ public class SSHMonitor {
 			skipOutput();
 		}
 	}
-	
-	public void skipOutput() throws IOException{
+
+	public void skipOutput() throws IOException {
 		input.read(new char[1024]);
 	}
 
@@ -43,10 +43,10 @@ public class SSHMonitor {
 			process = null;
 		}
 	}
-	
-	public BufferedReader executeCommand(String cmd) throws IOException{
-		//read everything before starting a new command
-		while(input.ready()){
+
+	public BufferedReader executeCommand(String cmd) throws IOException {
+		// read everything before starting a new command
+		while (input.ready()) {
 			skipOutput();
 		}
 		output.write(cmd + "\n");
@@ -59,13 +59,42 @@ public class SSHMonitor {
 		return Long.parseLong(input.readLine().split("\\s+")[3]);
 	}
 
+	/**
+	 * @return load average for the last 5 minutes
+	 * @throws IOException
+	 */
 	public float getLoadAvg() throws IOException {
+		return Float.parseFloat(getLoadAvgs()[1]);
+	}
+	
+	/**
+	 * @return load average for the last 1 minute
+	 * @throws IOException
+	 */
+	public float getLoadAvg1() throws IOException {
+		return Float.parseFloat(getLoadAvgs()[0]);
+	}
+	
+	/**
+	 * @return load average for the last 15 minutes
+	 * @throws IOException
+	 */
+	public float getLoadAvg15() throws IOException {
+		return Float.parseFloat(getLoadAvgs()[2]);
+	}
+
+	/**
+	 * @return loadavg string values from 1,5,15 minutes. need to be parsed
+	 * @throws IOException
+	 */
+	private String[] getLoadAvgs() throws IOException {
+		// The load string looks something like this:
+		// "0.79 0.83 0.95 1/600 25019"
+		// We will take the second value from this list of floats (which is the
+		// load average from the last few minutes)
 		BufferedReader input = executeCommand("cat /proc/loadavg");
 		String loadString = input.readLine();
-		//The load string looks something like this: "0.79 0.83 0.95 1/600 25019"
-		//We will take the second value from this list of floats (which is the load average from the last few minutes)
-		String[] tokens = loadString.split("");
-		return Float.parseFloat(tokens[1]);
+		return loadString.split("");
 	}
 
 	public float getCpuUsage() throws IOException {
@@ -84,9 +113,9 @@ public class SSHMonitor {
 			IOException {
 		SSHMonitor m = new SSHMonitor("ubuntu", "10.99.0.98");
 		System.out.println(m.getLoadAvg());
-//		System.out.println(m.getFreeMemory());
-//		System.out.println(m.getFreeMemory());
-//		System.out.println(m.getFreeMemory());
+		// System.out.println(m.getFreeMemory());
+		// System.out.println(m.getFreeMemory());
+		// System.out.println(m.getFreeMemory());
 		System.out.println(m.getCpuUsage());
 		m.closeConnection();
 	}
