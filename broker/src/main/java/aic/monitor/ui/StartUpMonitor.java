@@ -37,7 +37,6 @@ public class StartUpMonitor {
 		try {
 			ProcessBuilder pb = new ProcessBuilder("mongo", "admin","--eval","sh.addShard('" + getServerIp(s) + ":27018')");
 			pb.start();
-			Runtime.getRuntime().exec("mongo admin --eval \"sh.addShard('" + getServerIp(s) + ":27018')\"");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -51,7 +50,7 @@ public class StartUpMonitor {
 			Process child=new ProcessBuilder("mongo", "admin","--eval","db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} )").start();
 			do{
 				Thread.sleep(10000);
-				System.out.println("mongo admin --eval \"printjson(db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} ))\" | grep -q -i completed");
+				//System.out.println("mongo admin --eval \"printjson(db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} ))\" | grep -q -i completed");
 				child=new ProcessBuilder("/bin/sh","-c","mongo admin --eval \"printjson(db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} ))\" | grep -q -i completed").start();
 				child.waitFor();
 			}while(child.exitValue()!=0);
