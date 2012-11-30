@@ -1,7 +1,8 @@
 package aic.monitor.util;
 
-import java.io.FileInputStream;
 import java.util.Properties;
+
+import aic.monitor.ui.StartUpMonitor;
 
 public class PropertyManager {
 	private Properties properties = null;
@@ -9,7 +10,7 @@ public class PropertyManager {
 	private PropertyManager() {
 		properties = new Properties();
 		try {
-			properties.loadFromXML(new FileInputStream("properties.xml"));
+			properties.loadFromXML((StartUpMonitor.class.getResourceAsStream("properties.xml")));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
