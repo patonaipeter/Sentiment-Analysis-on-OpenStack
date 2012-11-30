@@ -80,7 +80,7 @@ public class LaunchMonitor {
 		Server server = this.getNovaClient().execute(
 				ServersCore.createServer(serverForCreate));
 
-		System.out.println(server);
+		//System.out.println(server);
 
 		return server;
 	}
@@ -96,7 +96,7 @@ public class LaunchMonitor {
 	public Flavor getFlavor(String id) {
 		for (Flavor flavor : this.getFlavors()) {
 			if (flavor.getId().equals(id)) {
-				System.out.println(flavor);
+				//System.out.println(flavor);
 				return flavor;
 			}
 		}
@@ -115,7 +115,7 @@ public class LaunchMonitor {
 	public Image getImage(String id) {
 		for (Image image : this.getImages()) {
 			if (image.getId().equals(id)) {
-				System.out.println(image);
+				//System.out.println(image);
 				return image;
 			}
 		}
@@ -130,7 +130,7 @@ public class LaunchMonitor {
 	public Volume getVolume(String id) {
 		for (Volume volume : this.getVolumes()) {
 			if (volume.getId().equals(id)) {
-				System.out.println(volume);
+				//System.out.println(volume);
 				return volume;
 			}
 		}
@@ -157,7 +157,7 @@ public class LaunchMonitor {
 		Volume volume = this.getNovaClient().execute(
 				VolumesExtension.createVolume(volumeForCreate));
 
-		System.out.println(volume);
+		//System.out.println(volume);
 
 		return volume;
 	}
@@ -174,7 +174,7 @@ public class LaunchMonitor {
 	public Server getServer(String id) {
 		for (Server server : this.getServers()) {
 			if (server.getId().equals(id)) {
-				System.out.println(server);
+				//System.out.println(server);
 				return server;
 			}
 		}
@@ -250,7 +250,7 @@ public class LaunchMonitor {
 		for (Flavor flavor : monitor.getFlavors()) {
 			if (flavor.getName().equals("m1.tiny"))
 				flavorRef = flavor.getLinks().get(0).getHref();
-			System.out.println(flavor);
+			//System.out.println(flavor);
 		}
 
 		// print all images
@@ -258,12 +258,12 @@ public class LaunchMonitor {
 			if (image.getName().equals("Ubuntu 12.10 amd64")) {
 				imgRef = image.getLinks().get(0).getHref();
 			}
-			System.out.println(image);
+			//System.out.println(image);
 		}
 
 		// print all instances
 		for (Server server : monitor.getServers()) {
-			System.out.println(server);
+			//System.out.println(server);
 		}
 
 		if (!(imgRef == null && flavorRef == null)) {
