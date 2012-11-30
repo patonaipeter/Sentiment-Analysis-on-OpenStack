@@ -35,7 +35,7 @@ public class StartUpMonitor {
 	 */
 	public void addShard(Server s){
 		try {
-			Runtime.getRuntime().exec("mongo tweets --eval \"sh.addShard('" + s.getAccessIPv4() + ":27018')\"");
+			Runtime.getRuntime().exec("mongo tweets --eval \"sh.addShard('" + getServerIp(s) + ":27018')\"");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -46,11 +46,11 @@ public class StartUpMonitor {
 	 */
 	public void removeShard(Server s){
 		try {
-			Runtime.getRuntime().exec("mongo tweets --eval \"use admin;db.runCommand( {removeShard: '" + s.getAccessIPv4() + ":27018'} )\"");
+			Runtime.getRuntime().exec("mongo tweets --eval \"use admin;db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} )\"");
 			Process child=null;
 			do{
 				Thread.sleep(10000);
-				child=Runtime.getRuntime().exec("mongo tweets --eval \"use admin;db.runCommand( {removeShard: '" + s.getAccessIPv4() + ":27018'} )\" | grep -q -i completed");
+				child=Runtime.getRuntime().exec("mongo tweets --eval \"use admin;db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} )\" | grep -q -i completed");
 				child.waitFor();
 			}while(child.exitValue()!=0);
 		} catch (Exception e) {
@@ -85,11 +85,13 @@ public class StartUpMonitor {
 					con.setServer(null);
 					con.setSsh(null);
 					
+					System.out.println("Suspending server: " + server.getName());
 					
 					new Thread(new Runnable(){
 						public void run(){
 							String id = server.getId();
 							
+							System.out.println("Remove from shard: " + server.getName());
 							removeShard(server);
 							//close ssh connection
 							try {
@@ -134,6 +136,8 @@ public class StartUpMonitor {
 				con.setServer(null);
 				con.setSsh(null);
 				
+				System.out.println("Resuming server: " + server.getName());
+				
 				new Thread(new Runnable() {
 					public void run() {
 						String id = server.getId();
@@ -150,17 +154,25 @@ public class StartUpMonitor {
 									.equals("ACTIVE");
 						}
 						Server s = monitor.getServer(id);
+						
+						//wait a little
+						try {
+							Thread.sleep(2000);
+						} catch (InterruptedException e2) {}
+						
+						System.out.println("Add to shard: " + server.getName());
+						
 						addShard(s);
 						
 						SSHMonitor m = null;
 						try {
-							m=new SSHMonitor("ubuntu",s.getAccessIPv4());
+							m=new SSHMonitor("ubuntu",getServerIp(s));
 						} catch (IOException e) {
 							//try again after 10 seconds maybe ssh server is not ready yet
 							try {Thread.sleep(10000);} catch (InterruptedException e1) {}
 							
 							try {
-								m=new SSHMonitor("ubuntu",s.getAccessIPv4());
+								m=new SSHMonitor("ubuntu",getServerIp(s));
 							} catch (IOException e1) {
 								//its no use the server is not reachable
 								e1.printStackTrace();
@@ -174,6 +186,10 @@ public class StartUpMonitor {
 			}
 		}
 	}
+	
+	private static String getServerIp(Server server){
+		return server.getAddresses().getPrivateList().iterator().next().getAddr();
+	}
 
 	public void start() throws IOException{
 		//keep a list of all managed instances
@@ -185,8 +201,8 @@ public class StartUpMonitor {
 					primary = true;
 				}
 				
-				managedInstances.add(new ServerConnection(server,new SSHMonitor("ubuntu",server.getAccessIPv4()),primary));
-				System.out.println("Server added: " + server.getName());
+				managedInstances.add(new ServerConnection(server,new SSHMonitor("ubuntu",getServerIp(server)),primary));
+				System.out.println("Server added: " + server.getName() + " at " + getServerIp(server));
 			}
 		}
 		
@@ -199,6 +215,7 @@ public class StartUpMonitor {
 			//   We need to manage a list of all instances (running and stopped), then we poll the active ones
 			//   and retrieve the data from them, using the SshMonitor.
 			int decision = strategy.decide(managedInstances);
+			System.out.println("Decision: " + decision);
 			if(decision>0){
 				//start new instance
 				resumeInstance();
