@@ -178,15 +178,15 @@ public class StartUpMonitor {
 	public void start() throws IOException{
 		//keep a list of all managed instances
 		for(Server server : monitor.getServers()) {
-			if(server!=null && server.getInstanceName()!=null && server.getInstanceName().matches("m\\d")){
+			if(server!=null && server.getName()!=null && server.getName().matches("m\\d")){
 				//primary server is never shut down
 				boolean primary = false;
-				if(server.getInstanceName().equals("m1")){
+				if(server.getName().equals("m1")){
 					primary = true;
 				}
 				
 				managedInstances.add(new ServerConnection(server,new SSHMonitor("ubuntu",server.getAccessIPv4()),primary));
-				System.out.println("Server added: " + server.getInstanceName());
+				System.out.println("Server added: " + server.getName());
 			}
 		}
 		
