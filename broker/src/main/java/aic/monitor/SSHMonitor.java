@@ -64,7 +64,7 @@ public class SSHMonitor {
 		String loadString = input.readLine();
 		//The load string looks something like this: "0.79 0.83 0.95 1/600 25019"
 		//We will take the second value from this list of floats (which is the load average from the last few minutes)
-		String[] tokens = loadString.split("");
+		String[] tokens = loadString.split("\\s+");
 		return Float.parseFloat(tokens[1]);
 	}
 
