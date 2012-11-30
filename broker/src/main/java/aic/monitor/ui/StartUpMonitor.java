@@ -114,7 +114,7 @@ public class StartUpMonitor {
 							Server s = monitor.getServer(id);
 							con.setServer(s);
 						}
-					});
+					}).start();
 					
 					break;
 				}
@@ -181,7 +181,7 @@ public class StartUpMonitor {
 						con.setSsh(m);
 						con.setServer(s);
 					}
-				});
+				}).start();
 				break;
 			}
 		}
