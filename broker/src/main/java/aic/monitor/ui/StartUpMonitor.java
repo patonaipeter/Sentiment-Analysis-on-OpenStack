@@ -35,9 +35,12 @@ public class StartUpMonitor {
 	 */
 	public void addShard(Server s){
 		try {
-			ProcessBuilder pb = new ProcessBuilder("mongo", "admin","--eval","sh.addShard('" + getServerIp(s) + ":27018')");
+			//drop the database (necessary if we want to add it to the shard later)
+			ProcessBuilder pb = new ProcessBuilder("mongo",getServerIp(s) + ":27018/tweets","--eval", "db.dropDatabase()");
+			pb.start().waitFor();
+			pb = new ProcessBuilder("mongo", "admin","--eval","sh.addShard('" + getServerIp(s) + ":27018')");
 			pb.start();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -54,6 +57,10 @@ public class StartUpMonitor {
 				child=new ProcessBuilder("/bin/sh","-c","mongo admin --eval \"printjson(db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} ))\" | grep -q -i completed").start();
 				child.waitFor();
 			}while(child.exitValue()!=0);
+			
+			//drop the database (necessary if we want to add it to the shard later)
+			ProcessBuilder pb = new ProcessBuilder("mongo",getServerIp(s) + ":27018/tweets","--eval", "db.dropDatabase()");
+			pb.start().waitFor();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -74,9 +81,7 @@ public class StartUpMonitor {
 			}
 		}
 		
-		if(reserve <= active){
-			
-			
+		if(reserve < active){
 			for(ServerConnection s : managedInstances){
 				Server tmp = s.getServer();
 				if(tmp!=null && tmp.getStatus().equals("ACTIVE") && !s.isPrimary()){
