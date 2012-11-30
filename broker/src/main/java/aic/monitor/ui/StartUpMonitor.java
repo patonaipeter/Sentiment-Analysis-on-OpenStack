@@ -35,6 +35,8 @@ public class StartUpMonitor {
 	 */
 	public void addShard(Server s){
 		try {
+			ProcessBuilder pb = new ProcessBuilder("mongo", "admin","--eval","sh.addShard('" + getServerIp(s) + ":27018')");
+			pb.start();
 			Runtime.getRuntime().exec("mongo admin --eval \"sh.addShard('" + getServerIp(s) + ":27018')\"");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -46,11 +48,11 @@ public class StartUpMonitor {
 	 */
 	public void removeShard(Server s){
 		try {
-			Runtime.getRuntime().exec("mongo admin --eval \"db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} )\"");
-			Process child=null;
+			Process child=new ProcessBuilder("mongo", "admin","--eval","db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} )").start();
 			do{
 				Thread.sleep(10000);
-				child=Runtime.getRuntime().exec("mongo admin --eval \"printjson(db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} ))\" | grep -q -i completed");
+				System.out.println();
+				child=new ProcessBuilder("/bin/sh","-c","mongo admin --eval \"printjson(db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} ))\" | grep -q -i completed").start();
 				child.waitFor();
 			}while(child.exitValue()!=0);
 		} catch (Exception e) {
@@ -98,6 +100,7 @@ public class StartUpMonitor {
 								ssh.closeConnection();
 							} catch (IOException e) {}
 							// terminate instance
+							System.out.println("Draining finished shutting down: " + server.getName());
 							monitor.suspendServer(id);
 							
 							// waiting for SUSPENDED state
