@@ -12,14 +12,14 @@ public class SimpleStrategy implements Strategy {
 	public int getSleepTime() {
 		if(lastDecision!=0){
 			//give it some time
-			return 12000;
+			return 2*60000;
 		}
-		return 2000;
+		return 10000;
 	}
 
 	@Override
 	public int getReserveServers() {
-		return 1;
+		return 2;
 	}
 
 	@Override

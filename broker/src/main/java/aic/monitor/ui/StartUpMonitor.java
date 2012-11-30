@@ -49,7 +49,7 @@ public class StartUpMonitor {
 		try {
 			Process child=new ProcessBuilder("mongo", "admin","--eval","db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} )").start();
 			do{
-				Thread.sleep(10000);
+				Thread.sleep(2*60000);
 				//System.out.println("mongo admin --eval \"printjson(db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} ))\" | grep -q -i completed");
 				child=new ProcessBuilder("/bin/sh","-c","mongo admin --eval \"printjson(db.runCommand( {removeShard: '" + getServerIp(s) + ":27018'} ))\" | grep -q -i completed").start();
 				child.waitFor();
