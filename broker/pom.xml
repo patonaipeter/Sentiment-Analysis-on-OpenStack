@@ -33,7 +33,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>aic.monitor.BaseMonitor</mainClass>
+							<mainClass>aic.monitor.ui.StartUpMonitor</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
