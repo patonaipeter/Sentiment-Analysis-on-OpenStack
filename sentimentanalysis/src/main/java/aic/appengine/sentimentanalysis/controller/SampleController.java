@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 public class SampleController extends AbstractController {
 
 	@Override
-	@RequestMapping("/sample2")
+	@RequestMapping("/sample")
 	protected ModelAndView handleRequestInternal(HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 		System.out.println("SimpleController was called");
