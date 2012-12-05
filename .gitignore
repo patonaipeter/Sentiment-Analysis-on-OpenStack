@@ -5,4 +5,5 @@
 .metadata/
 target/
 broker/properties.xml
+broker/lib
 */bin
