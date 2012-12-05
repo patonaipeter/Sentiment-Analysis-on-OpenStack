@@ -141,22 +141,6 @@
 					<port>8082</port>
 					<address>127.0.0.1</address>
 				</configuration>
-				<executions>
-					<execution>
-						<id>start-gae</id>
-						<goals>
-							<goal>stop</goal>
-							<goal>unpack</goal>
-							<goal>start</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>stop-gae</id>
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
