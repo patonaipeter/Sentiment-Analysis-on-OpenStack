@@ -28,7 +28,7 @@ public class SampleController extends AbstractController {
 	@RequestMapping("/sample")
 	protected ModelAndView handleRequestInternal(HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
-		System.out.println("SimpleController was called");
+
 		ModelAndView mav = new ModelAndView("index");
 		mav.addObject("greeting", "Hello User");
 
