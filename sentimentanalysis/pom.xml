@@ -9,12 +9,12 @@
 	<packaging>war</packaging>
 
 	<name>sentimentanalysis</name>
-	<url>http://maven.apache.org</url>
 
+	<!-- These properties are accessed in the dependencies below with the following
+		notation: ${...}, where ... is the property name -->
 	<properties>
 		<java.version>1.6</java.version>
 		<spring.version>3.1.0.RELEASE</spring.version>
-		<cglib.version>2.2.2</cglib.version>
 		<gae.version>1.7.3</gae.version>
 		<org.slf4j.version>1.5.8</org.slf4j.version>
 	</properties>
@@ -23,39 +23,9 @@
 		<!-- Spring core & mvc -->
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-orm</artifactId>
-			<version>${spring.version}</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>${spring.version}</version>
-			<type>jar</type>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- CGLib for @Configuration -->
-		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib-nodep</artifactId>
-			<version>${cglib.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-
 
 		<!-- Servlet Spec -->
 		<dependency>
@@ -95,40 +65,22 @@
 			<version>${gae.version}</version>
 			<scope>test</scope>
 		</dependency>
+
 		<!-- Logging -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${org.slf4j.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>${org.slf4j.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>${org.slf4j.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		
+
 		<!-- Apache Tiles -->
 		<dependency>
 			<groupId>org.apache.tiles</groupId>
 			<artifactId>tiles-extras</artifactId>
 			<version>2.2.2</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.tiles</groupId>
-			<artifactId>tiles-jsp</artifactId>
-			<version>2.2.2</version>
-		</dependency>
-		
+
 		<!-- Required to use the jstl taglib directive tag in a jsp file -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
