@@ -3,12 +3,25 @@
 	"-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
 	"http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
 <tiles-definitions>
+
+	<!-- This is the base definition for the layout file
+		 It registers the 'title' attribute with is used in
+		 the layout file.
+	 -->
 	<definition name="layout" template="/WEB-INF/layout/layout.jsp">
 		<put-attribute name="title" value="SentimentAnalysis" />
 	</definition>
 
+	<!-- This extends the layout file. Name is the name that can be
+		 set in the ModelAndView object to point to this particular
+		 tile. The content attribute references the location in the
+		 layout where this tile-part is going to be inserted. -->
 	<definition name="index" extends="layout">
 		<put-attribute name="content" value="/WEB-INF/views/index.jsp" />
+	</definition>
+	
+	<definition name="tasks" extends="layout">
+		<put-attribute name="content" value="/WEB-INF/views/tasks.jsp" />
 	</definition>
 
 	
