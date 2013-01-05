@@ -1,9 +1,13 @@
 package aic.data;
 
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.json.simple.JSONObject;
 
 import aic.data.dto.Tweet;
 
@@ -15,7 +19,9 @@ public class JSONWriter implements ITweetWriter {
 	private boolean first=true;
 
 	public JSONWriter(OutputStream os) {
-		out=new PrintWriter(os);
+		try {
+			out=new PrintWriter(new OutputStreamWriter(os,"UTF-8"));
+		} catch (UnsupportedEncodingException e) {e.printStackTrace();}
 		
 		//copied from http://drupal.org/node/1202
 		String noiseList="about,after,all,also,an,and,another,any,are,as,at,be,because,been,before" + 
@@ -54,15 +60,15 @@ public class JSONWriter implements ITweetWriter {
 		}
 		first=false;
 		out.println("{");
-		out.println("\"name\": \"" + tweet.getUsername() +"\",");
-		out.println("\"text\": \"" + tweet.getText() +"\",");
+		out.println("\"name\": \"" + JSONObject.escape(tweet.getUsername()) +"\",");
+		out.println("\"text\": \"" + JSONObject.escape(tweet.getText()) +"\",");
 		out.print("\"keywords\": [");
 		boolean firstword=true;
 		for(String word : getKeywords(tweet.getText())){
 			if(!firstword)
 				out.print(",");
 			firstword=false;
-			out.print("\"" + word  +   "\"");
+			out.print("\"" + JSONObject.escape(word)  +   "\"");
 		}
 		out.println("],");
 		out.println("\"sentiment\": " + tweet.getSentiment());
