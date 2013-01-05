@@ -1,6 +1,9 @@
 package aic.data;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 
 import net.sf.json.JSONException;
 import aic.data.dto.Tweet;
@@ -13,7 +16,7 @@ public class DataLoader {
 
 	public static void main(String[] args) {
 
-		if (args.length != 1) {
+		if (args.length < 1) {
 			usage();
 			System.exit(1);
 		}
@@ -23,7 +26,17 @@ public class DataLoader {
 			ITweetReader reader = new JsonLikeReader(new FileInputStream(args[0]));
 			Tweet t = reader.read();
 
-			ITweetWriter writer = new MongoWriter("localhost", "tweets");
+			ITweetWriter writer=null;
+			if (args.length == 1) {
+				writer = new MongoWriter("localhost", "tweets");
+			}else{
+				//writer = new JSONWriter(new FileOutputStream(args[1]));
+				//output gzip
+				writer = new JSONWriter(new DeflaterOutputStream(
+						new FileOutputStream(args[1]), new Deflater(
+								Deflater.BEST_COMPRESSION, false)));
+			}
+			
 			int cnt = 0;
 			do {
 				try {
@@ -38,7 +51,7 @@ public class DataLoader {
 				System.out.print("Inserted Tweet Number: " + cnt+"\r");
 			} while (t != null);
 			//add indexes
-			writer.index();
+			writer.close();
 			System.out.println("Written " + cnt + " tweets.");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
