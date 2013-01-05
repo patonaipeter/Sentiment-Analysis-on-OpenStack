@@ -2,8 +2,7 @@ package aic.data;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
+import java.util.zip.GZIPOutputStream;
 
 import net.sf.json.JSONException;
 import aic.data.dto.Tweet;
@@ -32,9 +31,8 @@ public class DataLoader {
 			}else{
 				//writer = new JSONWriter(new FileOutputStream(args[1]));
 				//output gzip
-				writer = new JSONWriter(new DeflaterOutputStream(
-						new FileOutputStream(args[1]), new Deflater(
-								Deflater.BEST_COMPRESSION, false)));
+				writer = new JSONWriter(new GZIPOutputStream(
+						new FileOutputStream(args[1])));
 			}
 			
 			int cnt = 0;

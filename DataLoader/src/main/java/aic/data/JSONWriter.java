@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import aic.data.dto.Tweet;
@@ -35,9 +36,6 @@ public class JSONWriter implements ITweetWriter {
 		for(String word : noiseList.split(",")){
 			noiseWords.add(word);
 		}
-		
-		out.println("{");
-		out.println("\"tweets\": [");
 	}
 	
 	private String[] getKeywords(String text){
@@ -55,24 +53,16 @@ public class JSONWriter implements ITweetWriter {
 
 	@Override
 	public void write(Tweet tweet) {
-		if(!first){
-			out.print(",");
-		}
-		first=false;
-		out.println("{");
-		out.println("\"name\": \"" + JSONObject.escape(tweet.getUsername()) +"\",");
-		out.println("\"text\": \"" + JSONObject.escape(tweet.getText()) +"\",");
-		out.print("\"keywords\": [");
-		boolean firstword=true;
+		JSONObject obj = new JSONObject();
+		obj.put("name", tweet.getUsername());
+		obj.put("text", tweet.getText());
+		obj.put("sentiment", tweet.getSentiment());
+		JSONArray arr = new JSONArray();
 		for(String word : getKeywords(tweet.getText())){
-			if(!firstword)
-				out.print(",");
-			firstword=false;
-			out.print("\"" + JSONObject.escape(word)  +   "\"");
+			arr.add(word);
 		}
-		out.println("],");
-		out.println("\"sentiment\": " + tweet.getSentiment());
-		out.print("}");
+		obj.put("keywords", arr);
+		out.println(obj.toString());
 	}
 
 	@Override
@@ -82,8 +72,6 @@ public class JSONWriter implements ITweetWriter {
 
 	@Override
 	public void close() {
-		out.println("]");
-		out.println("}");
 		out.close();
 	}
 }
