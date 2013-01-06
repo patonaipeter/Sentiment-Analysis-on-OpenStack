@@ -126,7 +126,7 @@ public class HomeController{
 
         int count=0;
         while ((line = in.readLine()) != null){
-        	
+        	p.reset();
         	try {
 				JSONObject obj=(JSONObject)p.parse(line);
 				//insert into datastore
