@@ -29,7 +29,7 @@ public class DataStoreAccess {
 	 * @throws IOException 
 	 *
 	 */
-	public void initDatastore(InputStream is) throws IOException{
+	public static void initDatastore(InputStream is) throws IOException{
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 				new GZIPInputStream(is)));
 
@@ -66,7 +66,7 @@ public class DataStoreAccess {
         in.close();
 	}
 	
-	public double getSentiment(String name) {
+	public static double getSentiment(String name) {
 		// Call Map/Reduce algorithm here and do some really cool stuff...	
 		
 		return 0.0;
