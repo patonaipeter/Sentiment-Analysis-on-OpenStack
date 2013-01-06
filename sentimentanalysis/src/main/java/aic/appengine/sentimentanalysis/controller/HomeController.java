@@ -1,32 +1,18 @@
 package aic.appengine.sentimentanalysis.controller;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.List;
-import java.util.zip.GZIPInputStream;
+import java.io.*;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
+import aic.appengine.sentimentanalysis.service.DataStoreAccess;
 
 @Controller
 public class HomeController{
@@ -54,45 +40,12 @@ public class HomeController{
 		//upload should be done in java with raw POST request
         InputStream is = request.getInputStream();
         
-        
-		BufferedReader in = new BufferedReader(new InputStreamReader(
-				new GZIPInputStream(is)));
-
-        String line=null;
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        JSONParser p = new JSONParser();
-
-        int count=0;
-        while ((line = in.readLine()) != null){
-        	
-        	try {
-				JSONObject obj=(JSONObject)p.parse(line);
-				//insert into datastore
-				if (obj.get("name") != null && obj.get("text") != null
-						&& obj.get("sentiment") != null
-						&& obj.get("keywords") != null) {
-					
-					Entity tweet = new Entity("tweets");
-					tweet.setUnindexedProperty("name", obj.get("name"));
-					tweet.setUnindexedProperty("text", obj.get("text"));
-					tweet.setUnindexedProperty("sentiment", obj.get("sentiment"));
-					List<String> arr = (List<String>)obj.get("keywords");
-					tweet.setProperty("keywords",arr);
-			        datastore.put(tweet);
-				}
-
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-        	System.out.print("Inserted: " + count + "\r");
-        	count++;
-        }
-        in.close();
+        DataStoreAccess data = new DataStoreAccess();
+        data.initDatastore(is);
         
 		return new ModelAndView("index");
 	}
 	
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/insertdata", method=RequestMethod.GET)
 	public ModelAndView insertData(HttpServletRequest request, HttpServletResponse response) throws IOException{
         /*
@@ -113,43 +66,12 @@ public class HomeController{
         //InputStream is=con.getInputStream();*/
         
         //this works but blows up the war file to 200mb
-        ServletContext context = request.getSession().getServletContext();
+		ServletContext context = request.getSession().getServletContext();
         InputStream is = context.getResourceAsStream("/WEB-INF/tweets.json.gz");
         
+        DataStoreAccess data = new DataStoreAccess();
+        data.initDatastore(is);
         
-		BufferedReader in = new BufferedReader(new InputStreamReader(
-				new GZIPInputStream(is)));
-
-        String line=null;
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        JSONParser p = new JSONParser();
-
-        int count=0;
-        while ((line = in.readLine()) != null){
-        	p.reset();
-        	try {
-				JSONObject obj=(JSONObject)p.parse(line);
-				//insert into datastore
-				if (obj.get("name") != null && obj.get("text") != null
-						&& obj.get("sentiment") != null
-						&& obj.get("keywords") != null) {
-					
-					Entity tweet = new Entity("tweets");
-					tweet.setUnindexedProperty("name", obj.get("name"));
-					tweet.setUnindexedProperty("text", obj.get("text"));
-					tweet.setUnindexedProperty("sentiment", obj.get("sentiment"));
-					List<String> arr = (List<String>)obj.get("keywords");
-					tweet.setProperty("keywords",arr);
-			        datastore.put(tweet);
-				}
-
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-        	System.out.print("Inserted: " + count + "\r");
-        	count++;
-        }
-        in.close();
 		return new ModelAndView("index");
 	}
 
