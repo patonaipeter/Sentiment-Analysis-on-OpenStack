@@ -6,7 +6,21 @@ import com.google.appengine.tools.mapreduce.ReducerInput;
 
 import java.util.logging.Logger;
 
-
+/*
+ * GAE Map/Reduce is experimental you have to compile the jar files first
+ * https://code.google.com/p/appengine-mapreduce/wiki/GettingStartedInJava
+ * 
+ * Check out the MapReduce code:
+ * svn checkout http://appengine-mapreduce.googlecode.com/svn/trunk/java
+ * Then, build the code using ant in the directory you just checked out:
+ *
+ * cd java
+ * ant
+ * 
+ * Then call the following in our project folder:
+ * 
+ * mvn install:install-file -Dfile=../../java/dist/lib/appengine-mapper.jar -Dpackaging=jar -DgroupId=com.google.appengine -DartifactId=appengine-mapper -Dversion=1.7.3
+ */
 class SentimentReducer extends Reducer<String, Double, KeyValue<String, Double>> {
 	private static final long serialVersionUID = 7946646886273610576L;
 	@SuppressWarnings("unused")
