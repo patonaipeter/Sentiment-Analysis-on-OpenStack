@@ -40,7 +40,7 @@ public class HomeController{
 		return new ModelAndView("index");
 	}
 	
-	@RequestMapping(value="/insertdata", method=RequestMethod.GET)
+	@RequestMapping(value="/tasks/insertdata", method=RequestMethod.GET)
 	public ModelAndView insertData(HttpServletRequest request, HttpServletResponse response) throws IOException{
 
         //this works but blows up the war file to 200mb
@@ -64,7 +64,7 @@ public class HomeController{
 
         Queue queue = QueueFactory.getDefaultQueue();
         //starts background task with url /insertdata
-        queue.add(withUrl("/insertdata").method(Method.GET));
+        queue.add(withUrl("/tasks/insertdata").method(Method.GET));
         
 		return new ModelAndView("index");
 	}

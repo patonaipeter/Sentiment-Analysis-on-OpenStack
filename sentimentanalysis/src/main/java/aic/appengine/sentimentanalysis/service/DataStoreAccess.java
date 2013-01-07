@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 
@@ -20,7 +21,8 @@ import com.google.appengine.api.datastore.Entity;
 
 @Service
 public class DataStoreAccess {
-	
+	private static final Logger log = Logger.getLogger(DataStoreAccess.class
+			.getName());
 	/**
 	 * TODO:
 	 * 
@@ -60,7 +62,9 @@ public class DataStoreAccess {
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-        	System.out.print("Inserted: " + count + "\r");
+        	if(count % 100 == 0){
+        		log.info("Inserted: " + count);
+        	}
         	count++;
         }
         in.close();
