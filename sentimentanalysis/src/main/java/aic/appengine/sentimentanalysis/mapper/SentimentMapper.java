@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * 
  * mvn install:install-file -Dfile=../../java/dist/lib/appengine-mapper.jar -Dpackaging=jar -DgroupId=com.google.appengine -DartifactId=appengine-mapper -Dversion=1.7.3
  */
-class SentimentMapper extends Mapper<Entity, String, Double> {
+public class SentimentMapper extends Mapper<Entity, String, Double> {
 	private static final long serialVersionUID = -7502805571528438406L;
 	private static final Logger log = Logger.getLogger(SentimentMapper.class
 			.getName());

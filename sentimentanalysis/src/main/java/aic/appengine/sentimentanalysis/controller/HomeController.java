@@ -78,6 +78,7 @@ public class HomeController{
 			HttpServletResponse response) {
 		System.out.println("Taskname: " + taskName);
 		System.out.println("Query: " + query);
+		System.out.println("Result: " + DataStoreAccess.getSentiment(query));
 		
 		return new ModelAndView("index");
 	}

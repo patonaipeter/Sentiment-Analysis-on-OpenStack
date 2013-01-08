@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * 
  * mvn install:install-file -Dfile=../../java/dist/lib/appengine-mapper.jar -Dpackaging=jar -DgroupId=com.google.appengine -DartifactId=appengine-mapper -Dversion=1.7.3
  */
-class SentimentReducer extends Reducer<String, Double, KeyValue<String, Double>> {
+public class SentimentReducer extends Reducer<String, Double, KeyValue<String, Double>> {
 	private static final long serialVersionUID = 7946646886273610576L;
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(SentimentReducer.class
