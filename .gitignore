@@ -1,7 +1,7 @@
 #Empty
 sentimentanalysis/.externalToolBuilders/
 .classpath
-.project
+#.project
 .settings/
 .metadata/
 target/

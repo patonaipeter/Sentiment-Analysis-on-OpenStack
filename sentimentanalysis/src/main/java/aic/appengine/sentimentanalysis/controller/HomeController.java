@@ -84,10 +84,11 @@ public class HomeController{
 	}
 	
 	
-	/*@RequestMapping(value="/uploaddata", method=RequestMethod.POST)
+	@RequestMapping(value="/uploaddata", method=RequestMethod.POST)
 	public ModelAndView uploadData(HttpServletRequest request, HttpServletResponse response) throws IOException{
 		//TODO not tested
 		//upload should be done in java with raw POST request
+		System.out.println("Uploading Data");
         InputStream is = request.getInputStream();
         
         DataStoreAccess.initDatastore(is);
@@ -95,7 +96,7 @@ public class HomeController{
 		return new ModelAndView("index");
 	}
 	
-	@RequestMapping(value="/downloaddata", method=RequestMethod.GET)
+	/*@RequestMapping(value="/downloaddata", method=RequestMethod.GET)
 	public ModelAndView downloadData(HttpServletRequest request, HttpServletResponse response) throws IOException{
 		//TODO: Problem
         //does not work because GAE does not allow streaming. The call to
