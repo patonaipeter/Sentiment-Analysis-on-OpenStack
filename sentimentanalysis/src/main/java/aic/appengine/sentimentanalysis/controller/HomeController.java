@@ -83,6 +83,16 @@ public class HomeController{
 		return new ModelAndView("index");
 	}
 	
+	@RequestMapping(value="/deletedata", method=RequestMethod.GET)
+	public ModelAndView deleteData(HttpServletRequest request, HttpServletResponse response) throws IOException{
+		//TODO not tested
+		//upload should be done in java with raw POST request
+		System.out.println("Deleting Data");
+        DataStoreAccess.deleteTweets();
+        
+		return new ModelAndView("index");
+	}
+	
 	
 	@RequestMapping(value="/uploaddata", method=RequestMethod.POST)
 	public ModelAndView uploadData(HttpServletRequest request, HttpServletResponse response) throws IOException{

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Service;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.mapreduce.KeyValue;
 import com.google.appengine.tools.mapreduce.MapReduceJob;
 import com.google.appengine.tools.mapreduce.MapReduceSettings;
@@ -41,9 +45,58 @@ public class DataStoreAccess {
 	 * @throws IOException 
 	 *
 	 */
+	
+	public static void deleteTweets() {
+		int deleted_count = 0;
+		boolean is_finished = false;
+		long start = System.currentTimeMillis();
+
+		while (System.currentTimeMillis() - start < 16384) {
+			final DatastoreService dss = DatastoreServiceFactory
+					.getDatastoreService();
+
+			final Query query = new Query("tweets");
+
+			query.setKeysOnly();
+
+			final ArrayList<Key> keys = new ArrayList<Key>();
+
+			for (final Entity entity : dss.prepare(query).asIterable(
+					FetchOptions.Builder.withLimit(128))) {
+				keys.add(entity.getKey());
+			}
+
+			keys.trimToSize();
+
+			if (keys.size() == 0) {
+				is_finished = true;
+				break;
+			}
+
+			while (System.currentTimeMillis() - start < 16384) {
+
+				try {
+
+					dss.delete(keys);
+
+					deleted_count += keys.size();
+
+					break;
+
+				} catch (Throwable ignore) {
+
+					continue;
+
+				}
+
+			}
+
+		}
+	}
+	
 	public static void initDatastore(InputStream is) throws IOException{
 		BufferedReader in = new BufferedReader(new InputStreamReader(
-				new GZIPInputStream(is)));
+				new GZIPInputStream(is),"UTF-8"));
 
         String line=null;
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();

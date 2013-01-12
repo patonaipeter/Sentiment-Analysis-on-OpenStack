@@ -17,7 +17,7 @@ public class Uploader {
 
 	public static void main(String[] argv) throws FileNotFoundException, IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(
-				new GZIPInputStream(new FileInputStream("tweets.json.gz"))));
+				new GZIPInputStream(new FileInputStream("tweets.json.gz")),"UTF-8"));
 		
         String line=null;
         do{
@@ -25,14 +25,15 @@ public class Uploader {
 	        PrintWriter out = new PrintWriter(new OutputStreamWriter(new GZIPOutputStream(bytearr),"UTF-8"));
 	        
 	        int count=0;
-	        while ((line = in.readLine()) != null && count<10000){
+	        while ((line = in.readLine()) != null && count<500){
 	        	out.println(line);
 	        	count++;
 	        }
 	        out.close();
 	        byte[] data=bytearr.toByteArray();
 	        
-	        URL url = new URL("http://localhost:8082/uploaddata");
+	        //URL url = new URL("http://localhost:8082/uploaddata");
+	        URL url = new URL("http://sentimentanalyis.appspot.com/uploaddata");
 	        HttpURLConnection http = (HttpURLConnection)url.openConnection();
 	        http.setRequestMethod("POST");
 	        http.setDoOutput(true);
@@ -49,7 +50,7 @@ public class Uploader {
 	        }
 	        in2.close();
 	        
-	        System.out.println("Loaded 10000");
+	        System.out.println("Loaded " + count);
         }while(line!=null);
         
         in.close();
