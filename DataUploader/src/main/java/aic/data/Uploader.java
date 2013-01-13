@@ -22,6 +22,7 @@ public class Uploader {
                 "UTF-8"));
 
         String line = null;
+        int sum = 0;
         do {
             ByteArrayOutputStream bytearr = new ByteArrayOutputStream();
             PrintWriter out = new PrintWriter(new OutputStreamWriter(
@@ -31,6 +32,7 @@ public class Uploader {
             while ((line = in.readLine()) != null && count < 500) {
                 out.println(line);
                 count++;
+                sum++;
             }
             out.close();
             byte[] data = bytearr.toByteArray();
@@ -54,7 +56,7 @@ public class Uploader {
             }
             in2.close();
 
-            System.out.println("Loaded " + count);
+            System.out.println("Loaded " + sum);
         } while (line != null);
 
         in.close();
