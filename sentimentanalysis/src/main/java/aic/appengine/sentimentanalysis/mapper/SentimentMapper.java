@@ -20,7 +20,9 @@ import java.util.logging.Logger;
  * 
  * Then call the following in our project folder:
  * 
- * mvn install:install-file -Dfile=../../java/dist/lib/appengine-mapper.jar -Dpackaging=jar -DgroupId=com.google.appengine -DartifactId=appengine-mapper -Dversion=1.7.3
+ * mvn install:install-file -Dfile=../../java/dist/lib/appengine-mapper.jar
+ *    -Dpackaging=jar -DgroupId=com.google.appengine
+ *    -DartifactId=appengine-mapper -Dversion=1.7.3
  */
 public class SentimentMapper extends Mapper<Entity, String, Double> {
 	private static final long serialVersionUID = -7502805571528438406L;
