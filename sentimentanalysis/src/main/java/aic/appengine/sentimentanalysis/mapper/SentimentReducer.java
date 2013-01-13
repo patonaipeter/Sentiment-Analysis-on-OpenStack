@@ -1,10 +1,10 @@
 package aic.appengine.sentimentanalysis.mapper;
 
+import java.util.logging.Logger;
+
 import com.google.appengine.tools.mapreduce.KeyValue;
 import com.google.appengine.tools.mapreduce.Reducer;
 import com.google.appengine.tools.mapreduce.ReducerInput;
-
-import java.util.logging.Logger;
 
 /*
  * GAE Map/Reduce is experimental you have to compile the jar files first
@@ -21,7 +21,9 @@ import java.util.logging.Logger;
  * 
  * mvn install:install-file -Dfile=../../java/dist/lib/appengine-mapper.jar -Dpackaging=jar -DgroupId=com.google.appengine -DartifactId=appengine-mapper -Dversion=1.7.3
  */
-public class SentimentReducer extends Reducer<String, Double, KeyValue<String, Double>> {
+public class SentimentReducer extends
+    Reducer<String, Double, KeyValue<String, Double>>
+{
 	private static final long serialVersionUID = 7946646886273610576L;
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(SentimentReducer.class
@@ -53,6 +55,7 @@ public class SentimentReducer extends Reducer<String, Double, KeyValue<String, D
 			total += value;
 			count++;
 		}
+
 		emit(key, total / count);
 	}
 
