@@ -47,10 +47,14 @@ public class SentimentMapper extends Mapper<Entity, String, Double> {
 
 	@Override
 	public void map(Entity entity) {
-		String text=(String)entity.getProperty("text");
-		Double sentiment=(Double)entity.getProperty("sentiment");
-		if(text.indexOf(searchTerm)!=-1){
-			getContext().emit("mean", sentiment);
+		Object textobj=entity.getProperty("text");
+		Object sentimentobj=entity.getProperty("sentiment");
+		if(textobj instanceof String && sentimentobj instanceof Double){
+			String text=(String)textobj;
+			Double sentiment=(Double)sentimentobj;
+			if(text.indexOf(searchTerm)!=-1){
+				getContext().emit("mean", sentiment);
+			}
 		}
 	}
 

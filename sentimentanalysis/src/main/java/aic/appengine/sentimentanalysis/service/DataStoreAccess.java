@@ -155,6 +155,24 @@ public class DataStoreAccess {
 		}
 		return settings;
 	}
+	
+	
+	private static MapReduceJob<Entity, String, Double, KeyValue<String, Double>, List<List<KeyValue<String, Double>>>>
+	getMapReduceJob(){
+	    return new MapReduceJob<Entity, String, Double, KeyValue<String, Double>, List<List<KeyValue<String, Double>>>>();
+	}
+	
+	private static MapReduceSpecification<Entity, String, Double, KeyValue<String, Double>, List<List<KeyValue<String, Double>>>>
+	getMapReduceSpec(String search, int mapShardCount, int reduceShardCount){
+		return MapReduceSpecification.of(
+	            "MapReduceTest stats",
+	            new DatastoreInput("tweets", mapShardCount),
+	            new SentimentMapper(search),
+	            Marshallers.getStringMarshaller(),
+	            new DoubleMarshaller(),
+	            new SentimentReducer(),
+	            new InMemoryOutput<KeyValue<String, Double>>(reduceShardCount));
+	}
 
 	
 	/*
@@ -173,25 +191,12 @@ public class DataStoreAccess {
 	 * mvn install:install-file -Dfile=../../java/dist/lib/appengine-mapper.jar -Dpackaging=jar -DgroupId=com.google.appengine -DartifactId=appengine-mapper -Dversion=1.7.3
 	 */
 	public static double getSentiment(String name) {
-		// Call Map/Reduce algorithm here and do some really cool stuff...	
-		//TODO specify with parameter
-		int mapShardCount=15;
-		int reduceShardCount=5;
-
 	    PipelineService service = PipelineServiceFactory.newPipelineService();
 	    MapReduceSettings settings = getSettings();
 
-	    String pipelineId=service.startNewPipeline(new MapReduceJob<Entity, String, Double, KeyValue<String, Double>, List<List<KeyValue<String, Double>>>>(),
-	    		MapReduceSpecification.of(
-			            "MapReduceTest stats",
-			            new DatastoreInput("tweets", mapShardCount),
-			            new SentimentMapper(name),
-			            Marshallers.getStringMarshaller(),
-			            new DoubleMarshaller(),
-			            new SentimentReducer(),
-			            new InMemoryOutput<KeyValue<String, Double>>(reduceShardCount)), settings, Util.jobSettings(settings));
+	    String pipelineId=service.startNewPipeline(getMapReduceJob(),
+	    		getMapReduceSpec(name,15,5), settings, Util.jobSettings(settings));
 
-		
 		try{
 			while(service.getJobInfo(pipelineId).getJobState()!=JobInfo.State.COMPLETED_SUCCESSFULLY){
 				Thread.sleep(500);
