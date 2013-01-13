@@ -64,8 +64,6 @@
 		    <version>13.0.1</version>
 		</dependency>
 
-
-
 		<!-- Google App Engine Dependencies -->
 		<dependency>
 			<groupId>com.google.appengine</groupId>
@@ -94,6 +92,12 @@
 			<artifactId>appengine-testing</artifactId>
 			<version>${gae.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.appengine</groupId>
+			<artifactId>appengine-remote-api</artifactId>
+			<version>${gae.version}</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Logging -->
