@@ -117,23 +117,31 @@ public class DataStoreAccess {
 						&& obj.get("sentiment") != null
 						&& obj.get("keywords") != null) {
 					
-					Entity tweet = new Entity("tweets");
-					tweet.setUnindexedProperty("name", obj.get("name"));
-					tweet.setUnindexedProperty("text", obj.get("text"));
-					tweet.setUnindexedProperty("sentiment", obj.get("sentiment"));
-					@SuppressWarnings("unchecked")
-					List<String> arr = (List<String>)obj.get("keywords");
-					tweet.setProperty("keywords",arr);
-			        datastore.put(tweet);
+					Object textobj = obj.get("text");
+					Object sentimentobj = obj.get("sentiment");
+					if (textobj instanceof String && sentimentobj instanceof Double) {
+						String text = (String) textobj;
+						Double sentiment = (Double) sentimentobj;
+						if (text.length() > 0) {
+							Entity tweet = new Entity("tweets");
+							//tweet.setUnindexedProperty("name", obj.get("name"));
+							tweet.setUnindexedProperty("text", text);
+							tweet.setUnindexedProperty("sentiment",sentiment);
+							//@SuppressWarnings("unchecked")
+							//List<String> arr = (List<String>)obj.get("keywords");
+							//tweet.setProperty("keywords",arr);
+							datastore.put(tweet);
+							count++;
+				        	if(count % 100 == 0){
+				        		log.info("Inserted: " + count);
+				        	}
+						}
+					}
 				}
 
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-        	if(count % 100 == 0){
-        		log.info("Inserted: " + count);
-        	}
-        	count++;
         }
         in.close();
 	}
@@ -167,8 +175,8 @@ public class DataStoreAccess {
 	public static double getSentiment(String name) {
 		// Call Map/Reduce algorithm here and do some really cool stuff...	
 		//TODO specify with parameter
-		int mapShardCount=1;
-		int reduceShardCount=1;
+		int mapShardCount=15;
+		int reduceShardCount=5;
 
 	    PipelineService service = PipelineServiceFactory.newPipelineService();
 	    MapReduceSettings settings = getSettings();
@@ -186,8 +194,7 @@ public class DataStoreAccess {
 		
 		try{
 			while(service.getJobInfo(pipelineId).getJobState()!=JobInfo.State.COMPLETED_SUCCESSFULLY){
-				//sleep
-				Thread.sleep(1000);
+				Thread.sleep(500);
 			}
 			JobInfo jobInfo = service.getJobInfo(pipelineId);
 			@SuppressWarnings("unchecked")
