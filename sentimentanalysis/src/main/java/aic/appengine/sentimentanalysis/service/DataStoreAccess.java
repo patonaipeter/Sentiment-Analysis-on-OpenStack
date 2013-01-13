@@ -23,11 +23,16 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.mapreduce.KeyValue;
 import com.google.appengine.tools.mapreduce.MapReduceJob;
+import com.google.appengine.tools.mapreduce.MapReduceResult;
 import com.google.appengine.tools.mapreduce.MapReduceSettings;
 import com.google.appengine.tools.mapreduce.MapReduceSpecification;
 import com.google.appengine.tools.mapreduce.Marshallers;
+import com.google.appengine.tools.mapreduce.impl.Util;
 import com.google.appengine.tools.mapreduce.inputs.DatastoreInput;
 import com.google.appengine.tools.mapreduce.outputs.InMemoryOutput;
+import com.google.appengine.tools.pipeline.JobInfo;
+import com.google.appengine.tools.pipeline.PipelineService;
+import com.google.appengine.tools.pipeline.PipelineServiceFactory;
 
 import aic.appengine.sentimentanalysis.mapper.*;
 
@@ -162,33 +167,47 @@ public class DataStoreAccess {
 	public static double getSentiment(String name) {
 		// Call Map/Reduce algorithm here and do some really cool stuff...	
 		//TODO specify with parameter
-		int mapShardCount=15;
-		int reduceShardCount=10;
-		InMemoryOutput<KeyValue<String, Double>> output=new InMemoryOutput<KeyValue<String, Double>>(reduceShardCount);
+		int mapShardCount=1;
+		int reduceShardCount=1;
+
+	    PipelineService service = PipelineServiceFactory.newPipelineService();
+	    MapReduceSettings settings = getSettings();
+
+	    String pipelineId=service.startNewPipeline(new MapReduceJob<Entity, String, Double, KeyValue<String, Double>, List<List<KeyValue<String, Double>>>>(),
+	    		MapReduceSpecification.of(
+			            "MapReduceTest stats",
+			            new DatastoreInput("tweets", mapShardCount),
+			            new SentimentMapper(name),
+			            Marshallers.getStringMarshaller(),
+			            new DoubleMarshaller(),
+			            new SentimentReducer(),
+			            new InMemoryOutput<KeyValue<String, Double>>(reduceShardCount)), settings, Util.jobSettings(settings));
+
 		
-		MapReduceJob.start(
-		        MapReduceSpecification.of(
-		            "MapReduceTest stats",
-		            new DatastoreInput("tweets", mapShardCount),
-		            new SentimentMapper(name),
-		            Marshallers.getStringMarshaller(),
-		            new DoubleMarshaller(),
-		            new SentimentReducer(),
-		            output),
-		        getSettings());
-		//TODO: does not work yet (no results...)
-		List<List<KeyValue<String, Double>>> result=output.finish(output.createWriters());
-		
-		double total = 0;
-		int count = 0;
-		for(List<KeyValue<String, Double>> shardlist : result){
-			for(KeyValue<String, Double> kv : shardlist){
-				total+=kv.getValue();
-				count++;
+		try{
+			while(service.getJobInfo(pipelineId).getJobState()!=JobInfo.State.COMPLETED_SUCCESSFULLY){
+				//sleep
+				Thread.sleep(1000);
 			}
+			JobInfo jobInfo = service.getJobInfo(pipelineId);
+			@SuppressWarnings("unchecked")
+			MapReduceResult<List<List<KeyValue<String, Double>>>> result=(MapReduceResult<List<List<KeyValue<String, Double>>>>)jobInfo.getOutput();
+			
+			
+			double total = 0;
+			int count = 0;
+			for(List<KeyValue<String, Double>> shardlist : result.getOutputResult()){
+				for(KeyValue<String, Double> kv : shardlist){
+					total+=kv.getValue();
+					count++;
+				}
+			}
+			System.out.println(total);
+			System.out.println(count);
+			return total / count;
+		}catch(Exception e){
+			e.printStackTrace();
+			return 0;
 		}
-		System.out.println(total);
-		System.out.println(count);
-		return total / count;
 	}
 }
