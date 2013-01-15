@@ -15,13 +15,13 @@ import com.google.appengine.tools.mapreduce.impl.Util;
 import com.google.appengine.tools.mapreduce.inputs.DatastoreInput;
 import com.google.appengine.tools.mapreduce.outputs.InMemoryOutput;
 import com.google.appengine.tools.pipeline.FutureValue;
-import com.google.appengine.tools.pipeline.Job0;
 import com.google.appengine.tools.pipeline.Job1;
+import com.google.appengine.tools.pipeline.Job2;
 import com.google.appengine.tools.pipeline.Value;
 
-public class WrapperJob extends Job0<Void>{
+public class WrapperJob extends Job1<Void,MapReduceSettings>{
 	private static final long serialVersionUID = -3988602398941459031L;
-	final private String user;
+	private String user;
 	private String search;
 	private int mapShardCount;
 	private int reduceShardCount;
@@ -52,18 +52,11 @@ public class WrapperJob extends Job0<Void>{
 	            new InMemoryOutput<KeyValue<String, Double>>(reduceShardCount));
 	}
 	
-	private MapReduceSettings getSettings() {
-		MapReduceSettings settings = new MapReduceSettings()
-				.setWorkerQueueName("mapreduce-workers")
-				.setControllerQueueName("default");
-		return settings;
-	}
-	
-	private class FinalCleanupJob extends Job1<Void, MapReduceResult<List<List<KeyValue<String, Double>>>>> {
+	private static class FinalCleanupJob extends Job2<Void, String,MapReduceResult<List<List<KeyValue<String, Double>>>>> {
 		private static final long serialVersionUID = -7916067625541463185L;
 
 		@Override
-		public Value<Void> run(
+		public Value<Void> run(String user,
 				MapReduceResult<List<List<KeyValue<String, Double>>>> result) {
 			
 			double total = 0;
@@ -89,12 +82,10 @@ public class WrapperJob extends Job0<Void>{
 	}
 	
 	@Override
-	public Value<Void> run() {
-	    MapReduceSettings settings = getSettings();
-
+	public Value<Void> run(MapReduceSettings settings) {
 		FutureValue<MapReduceResult<List<List<KeyValue<String, Double>>>>> result = futureCall(getMapReduceJob(), immediate(getMapReduceSpec()), immediate(settings),Util.jobSettings(settings));
 		
-		futureCall(new FinalCleanupJob(), result,Util.jobSettings(settings, waitFor(result)));
+		futureCall(new FinalCleanupJob(), immediate(user),result,Util.jobSettings(settings));
 		return null;
 	}
 

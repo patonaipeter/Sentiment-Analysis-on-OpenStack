@@ -37,8 +37,8 @@ public class Uploader {
             out.close();
             byte[] data = bytearr.toByteArray();
 
-            // URL url = new URL("http://localhost:8082/uploaddata");
-            URL url = new URL("http://sentimentanalyis.appspot.com/uploaddata");
+            URL url = new URL("http://localhost:8082/uploaddata");
+            //URL url = new URL("http://sentimentanalyis.appspot.com/uploaddata");
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod("POST");
             http.setDoOutput(true);

@@ -226,7 +226,8 @@ public class DataStoreAccess {
 	
 	public static void startSentimentAnalysis(String name){
 		PipelineService service = PipelineServiceFactory.newPipelineService();
-
-	    service.startNewPipeline(new WrapperJob("testuser",name,15,10));
+		MapReduceSettings settings = getSettings();
+		
+	    service.startNewPipeline(new WrapperJob("testuser",name,15,10),settings,Util.jobSettings(settings));
 	}
 }
