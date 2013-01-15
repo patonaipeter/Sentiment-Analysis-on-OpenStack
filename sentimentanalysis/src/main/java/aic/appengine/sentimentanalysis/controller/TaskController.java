@@ -43,9 +43,13 @@ public class TaskController {
         ModelAndView mav = new ModelAndView("tasks");
         // mav.addObject(taskService.getTasks());
         
+        UserService userService = UserServiceFactory.getUserService();
+        String email = userService.getCurrentUser().getEmail();
+        
+        Key emailKey = KeyFactory.createKey("user", email);
         
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        Query dataQuery = new Query("task").addSort("date",
+        Query dataQuery = new Query("task", emailKey).addSort("date",
                 Query.SortDirection.DESCENDING);
         List<Entity> tasks = datastore.prepare(dataQuery).asList(
                 FetchOptions.Builder.withLimit(20));
