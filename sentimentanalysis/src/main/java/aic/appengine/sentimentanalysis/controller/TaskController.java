@@ -2,14 +2,12 @@ package aic.appengine.sentimentanalysis.controller;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -64,8 +62,8 @@ public class TaskController {
             Task task = new Task();
             if(entity.getProperty("date") instanceof Date)
                 task.setDate((Date) entity.getProperty("date"));
-            if(entity.getProperty("taskname") instanceof String)
-                task.setName((String) entity.getProperty("taskname"));
+            if(entity.getProperty("name") instanceof String)
+                task.setName((String) entity.getProperty("name"));
             if(entity.getProperty("query") instanceof String)
                 task.setQuery((String) entity.getProperty("query"));
             if(entity.getProperty("status") instanceof String)
