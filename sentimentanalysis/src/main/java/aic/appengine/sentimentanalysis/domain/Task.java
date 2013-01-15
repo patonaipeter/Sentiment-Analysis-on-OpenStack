@@ -8,6 +8,15 @@ public class Task {
     private String query;
     private Date date;
     private String status;
+    private double sentiment;
+
+    public double getSentiment() {
+        return sentiment;
+    }
+
+    public void setSentiment(double sentiment) {
+        this.sentiment = sentiment;
+    }
 
     public Date getDate() {
         return date;
