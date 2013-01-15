@@ -5,6 +5,9 @@ import java.util.List;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.tools.mapreduce.KeyValue;
 import com.google.appengine.tools.mapreduce.MapReduceJob;
 import com.google.appengine.tools.mapreduce.MapReduceResult;
@@ -21,16 +24,16 @@ import com.google.appengine.tools.pipeline.Value;
 
 public class WrapperJob extends Job1<Void,MapReduceSettings>{
 	private static final long serialVersionUID = -3988602398941459031L;
-	private String user;
-	private String search;
+	private long taskId;
+	private String query;
 	private int mapShardCount;
 	private int reduceShardCount;
 	
-	public WrapperJob(String user, String search, int mapShardCount,
+	public WrapperJob(long taskId, String search, int mapShardCount,
 			int reduceShardCount) {
 		super();
-		this.user = user;
-		this.search = search;
+		this.taskId = taskId;
+		this.query = search;
 		this.mapShardCount = mapShardCount;
 		this.reduceShardCount = reduceShardCount;
 	}
@@ -45,18 +48,18 @@ public class WrapperJob extends Job1<Void,MapReduceSettings>{
 		return MapReduceSpecification.of(
 	            "MapReduceTest stats",
 	            new DatastoreInput("tweets", mapShardCount),
-	            new SentimentMapper(search),
+	            new SentimentMapper(query),
 	            Marshallers.getStringMarshaller(),
 	            new DoubleMarshaller(),
 	            new SentimentReducer(),
 	            new InMemoryOutput<KeyValue<String, Double>>(reduceShardCount));
 	}
 	
-	private static class FinalCleanupJob extends Job2<Void, String,MapReduceResult<List<List<KeyValue<String, Double>>>>> {
+	private static class FinalCleanupJob extends Job2<Void, Long,MapReduceResult<List<List<KeyValue<String, Double>>>>> {
 		private static final long serialVersionUID = -7916067625541463185L;
 
 		@Override
-		public Value<Void> run(String user,
+		public Value<Void> run(Long taskId,
 				MapReduceResult<List<List<KeyValue<String, Double>>>> result) {
 			
 			double total = 0;
@@ -70,11 +73,16 @@ public class WrapperJob extends Job1<Void,MapReduceSettings>{
 			
 			if(count!=0){
 				//insert into datastore
-				DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-				Entity task = new Entity("tasks");
-				task.setProperty("user", user);
-				task.setProperty("sentiment",total / count);
-				datastore.put(task);
+				try {
+					DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+					Key taskKey = KeyFactory.createKey("tasks", taskId);
+					Entity task = datastore.get(taskKey);
+					task.setProperty("status", "COMPLETED");
+					task.setProperty("sentiment",total / count);
+					datastore.put(task);
+				} catch (EntityNotFoundException e) {
+					e.printStackTrace();
+				}
 			}
 			
 			return null;
@@ -85,7 +93,7 @@ public class WrapperJob extends Job1<Void,MapReduceSettings>{
 	public Value<Void> run(MapReduceSettings settings) {
 		FutureValue<MapReduceResult<List<List<KeyValue<String, Double>>>>> result = futureCall(getMapReduceJob(), immediate(getMapReduceSpec()), immediate(settings),Util.jobSettings(settings));
 		
-		futureCall(new FinalCleanupJob(), immediate(user),result,Util.jobSettings(settings));
+		futureCall(new FinalCleanupJob(), immediate(taskId),result,Util.jobSettings(settings));
 		return null;
 	}
 
