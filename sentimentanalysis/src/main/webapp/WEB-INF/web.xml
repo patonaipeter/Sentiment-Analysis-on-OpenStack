@@ -79,10 +79,14 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j
 		</auth-constraint>
 	</security-constraint>
 	
+	
+	<!-- This rule matches /* so it must be last in the list, otherwise
+		 the other rules 
+	-->
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>indexpage</web-resource-name>
-			<url-pattern>/</url-pattern>
+			<url-pattern>/*</url-pattern>
 			</web-resource-collection>
 		<auth-constraint>
 			<role-name>*</role-name>
