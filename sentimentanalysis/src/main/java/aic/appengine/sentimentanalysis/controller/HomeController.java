@@ -1,17 +1,27 @@
 package aic.appengine.sentimentanalysis.controller;
 
 import java.io.*;
+import java.util.Date;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions.Method;
@@ -43,27 +53,11 @@ public class HomeController {
             HttpServletResponse response) throws IOException {
         UserService userService = UserServiceFactory.getUserService();
         User user = userService.getCurrentUser();
-        if (user != null) {
-            return new ModelAndView("index");
-        } else {
-            return new ModelAndView("redirect:/login");
-        }
-    }
-
-    /**
-     * This is the method that receives the task name and query information from
-     * the form on the index page, when the form has been submitted.
-     */
-    @RequestMapping(value = "/", method = RequestMethod.POST)
-    public ModelAndView showIndexPage(
-            @RequestParam("taskname") String taskName,
-            @RequestParam("query") String query, HttpServletRequest request,
-            HttpServletResponse response) {
-        System.out.println("Taskname: " + taskName);
-        System.out.println("Query: " + query);
-        System.out.println("Result: " + DataStoreAccess.getSentiment(query));
-
+        //if (user != null) {
         return new ModelAndView("index");
+        //} else {
+          //  return new ModelAndView("redirect:/login");
+        //}
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)

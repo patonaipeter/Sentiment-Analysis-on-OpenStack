@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,8 +19,8 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
-
-import aic.appengine.sentimentanalysis.domain.Task;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 
 @Controller
 public class TaskController {
@@ -42,36 +41,43 @@ public class TaskController {
             HttpServletResponse response) {
         ModelAndView mav = new ModelAndView("tasks");
         // mav.addObject(taskService.getTasks());
-        return mav;
-    }
-
-    public ModelAndView create(@ModelAttribute("taskname") String taskname,
-            @ModelAttribute("email") String email,
-            @ModelAttribute("query") String query,
-            @ModelAttribute("status") String status) {
-
-        Key emailKey = KeyFactory.createKey("user", email);
-
-        Entity task = new Entity("task", emailKey);
-        task.setProperty("date", new Date());
-        task.setProperty("name", taskname);
-        task.setProperty("query", query);
-        task.setProperty("status", status);
-
-        DatastoreService datastore = DatastoreServiceFactory
-                .getDatastoreService();
-        datastore.put(task);
-
-        ModelAndView mav = new ModelAndView("tasks");
         
+        
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Query dataQuery = new Query("task").addSort("date",
                 Query.SortDirection.DESCENDING);
         List<Entity> tasks = datastore.prepare(dataQuery).asList(
-                FetchOptions.Builder.withLimit(10));
+                FetchOptions.Builder.withLimit(20));
 
         mav.addObject("tasks", tasks);
 
         return mav;
+    }
 
+    /**
+     * This is the method that receives the task name and query information from
+     * the form on the index page, when the form has been submitted.
+     */
+    @RequestMapping(value = "/tasks", method = RequestMethod.POST)
+    public String create(@ModelAttribute("taskname") String taskname,
+            @ModelAttribute("query") String query) {
+
+        UserService userService = UserServiceFactory.getUserService();
+        String email = userService.getCurrentUser().getEmail();
+
+        Key emailKey = KeyFactory.createKey("user", email);
+
+        System.out.println("taskname: " + taskname);
+        System.out.println("query: " + query);
+        Entity task = new Entity("task", emailKey);
+        task.setProperty("date", new Date());
+        task.setProperty("name", taskname);
+        task.setProperty("query", query);
+        task.setProperty("status", "PENDING");
+
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        datastore.put(task);
+
+        return "redirect:tasks";
     }
 }

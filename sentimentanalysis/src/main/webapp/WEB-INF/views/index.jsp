@@ -5,7 +5,7 @@
 		task.</p>
 
 	<div id="task">
-		<form:form modelAttribute="task"  method="post" action="createTask" >
+		<form:form modelAttribute="task"  method="post" action="/tasks" >
 			<table>
 				<tr>
 					<td><label for="taskname">Taskname:</label></td>
