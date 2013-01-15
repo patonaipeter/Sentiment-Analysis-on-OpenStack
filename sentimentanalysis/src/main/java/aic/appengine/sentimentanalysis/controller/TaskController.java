@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.appengine.api.datastore.DatastoreService;
@@ -59,8 +60,8 @@ public class TaskController {
      * the form on the index page, when the form has been submitted.
      */
     @RequestMapping(value = "/tasks", method = RequestMethod.POST)
-    public String create(@ModelAttribute("taskname") String taskname,
-            @ModelAttribute("query") String query) {
+    public String create(@RequestParam("taskname") String taskname,
+            @RequestParam("query") String query) {
 
         UserService userService = UserServiceFactory.getUserService();
         String email = userService.getCurrentUser().getEmail();
@@ -78,6 +79,6 @@ public class TaskController {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(task);
 
-        return "redirect:tasks";
+        return "redirect:/tasks";
     }
 }
