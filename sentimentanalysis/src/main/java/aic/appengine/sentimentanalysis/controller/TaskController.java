@@ -3,11 +3,14 @@ package aic.appengine.sentimentanalysis.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+
+import aic.appengine.sentimentanalysis.domain.Task;
 
 @Controller
 public class TaskController {
@@ -26,5 +29,19 @@ public class TaskController {
 		ModelAndView mav = new ModelAndView("tasks");
 		//mav.addObject(taskService.getTasks());
 		return mav;
+	}
+	
+	@RequestMapping(value = "/createTask", method = RequestMethod.POST)
+	public String create(@ModelAttribute("task") Task task, BindingResult result) {
+		
+		//TODO save entity
+		//start mapreduce
+		//redirect to listing page
+		
+		return null;
+			
+    		
+    		
+    		
 	}
 }

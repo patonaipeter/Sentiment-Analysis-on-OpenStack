@@ -23,6 +23,10 @@
 	<definition name="tasks" extends="layout">
 		<put-attribute name="content" value="/WEB-INF/views/tasks.jsp" />
 	</definition>
+	
+	<definition name="login" extends="layout">
+		<put-attribute name="content" value="/WEB-INF/views/login.jsp" />
+	</definition>
 
 	
 </tiles-definitions>

@@ -1,9 +1,11 @@
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+
 <div id="wrapper">
 	<p>This is a google app engine test page for our sentiment analysis
 		task.</p>
 
 	<div id="task">
-		<form method="post" action="/" >
+		<form:form modelAttribute="task"  method="post" action="createTask" >
 			<table>
 				<tr>
 					<td><label for="taskname">Taskname:</label></td>
@@ -18,7 +20,7 @@
 					<td><input type="submit" value="Submit Task" />
 				</tr>
 			</table>
-		</form>
+		</form:form>
 	</div>
 	<h2>TODO:</h2>
 	<ul>
