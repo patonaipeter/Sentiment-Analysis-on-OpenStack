@@ -65,13 +65,13 @@ public class TaskController {
             if(entity.getProperty("query") instanceof String)
                 task.setQuery((String) entity.getProperty("query"));
             if(entity.getProperty("sentiment") instanceof Integer)
-                task.setQuery((String) entity.getProperty("sentiment"));
+                task.setSentiment((String) entity.getProperty("sentiment"));
             if(entity.getProperty("status") instanceof String)
                 task.setStatus((String) entity.getProperty("status"));
             if(entity.getProperty("date") instanceof Date)
                 task.setDate((Date) entity.getProperty("date"));
             if(entity.getProperty("duration") instanceof Long)
-                task.setDate((Date) entity.getProperty("duration"));
+                task.setDuration((Long) entity.getProperty("duration"));
             tasks.add(task);
         }
 
