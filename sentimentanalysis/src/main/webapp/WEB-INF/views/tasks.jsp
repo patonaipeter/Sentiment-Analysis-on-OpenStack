@@ -15,7 +15,7 @@
 				<td>${task.name}</td>
 				<td>${task.query}</td>
 				<c:if test="${empty task.sentiment}">
-					<td style="text-algin:center;">-</td>
+					<td style="text-align:center;">-</td>
 				</c:if>
 				<c:if test="${not empty task.sentiment}">
 					<td>${task.sentiment}</td>
@@ -23,13 +23,12 @@
 				<td>${task.status}</td>
 				<td>${task.date}</td>
 				<c:if test="${empty task.duration}">
-					<td>-</td>
+					<td style="text-align:center;">-</td>
 				</c:if>
 				<c:if test="${not empty task.duration}">
-					<td>${task.duration}</td>
+					<td style="text-align:right;">${task.duration}ms</td>
 				</c:if>
 			</tr>
 		</c:forEach>
-		
 	</table>
 </div>
