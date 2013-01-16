@@ -64,8 +64,8 @@ public class TaskController {
                 task.setName((String) entity.getProperty("name"));
             if(entity.getProperty("query") instanceof String)
                 task.setQuery((String) entity.getProperty("query"));
-            if(entity.getProperty("sentiment") instanceof Integer)
-                task.setSentiment((String) entity.getProperty("sentiment"));
+            if(entity.getProperty("sentiment") instanceof Double)
+                task.setSentiment((Double) entity.getProperty("sentiment"));
             if(entity.getProperty("status") instanceof String)
                 task.setStatus((String) entity.getProperty("status"));
             if(entity.getProperty("date") instanceof Date)
