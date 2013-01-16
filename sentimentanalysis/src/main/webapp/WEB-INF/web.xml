@@ -78,8 +78,14 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
-	
-	
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>uploaddata</web-resource-name>
+			<url-pattern>/uploaddata</url-pattern>
+		</web-resource-collection>
+	</security-constraint>
+
 	<!-- This rule matches /* so it must be last in the list, otherwise
 		 the other rules 
 	-->

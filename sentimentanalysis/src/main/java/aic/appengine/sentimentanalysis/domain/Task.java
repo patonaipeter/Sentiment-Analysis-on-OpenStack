@@ -6,15 +6,24 @@ public class Task {
 
     private String name;
     private String query;
-    private Date date;
+    private Double sentiment;
     private String status;
-    private double sentiment;
+    private Date date;
+    private Long duration;
 
-    public double getSentiment() {
+    public Long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
+    }
+
+    public Double getSentiment() {
         return sentiment;
     }
 
-    public void setSentiment(double sentiment) {
+    public void setSentiment(Double sentiment) {
         this.sentiment = sentiment;
     }
 
