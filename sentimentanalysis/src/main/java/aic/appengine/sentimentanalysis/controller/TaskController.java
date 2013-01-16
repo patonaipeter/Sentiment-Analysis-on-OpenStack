@@ -104,7 +104,7 @@ public class TaskController {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(task);
 
-        DataStoreAccess.startSentimentAnalysis(query, task.getKey().getId());
+        DataStoreAccess.startSentimentAnalysis(query,email,task.getKey().getId());
 
         return "redirect:/tasks";
     }

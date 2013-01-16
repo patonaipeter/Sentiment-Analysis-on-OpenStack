@@ -224,10 +224,10 @@ public class DataStoreAccess {
 	}
 	
 	
-	public static void startSentimentAnalysis(String query,long taskId){
+	public static void startSentimentAnalysis(String query,String email,long taskId){
 		PipelineService service = PipelineServiceFactory.newPipelineService();
 		MapReduceSettings settings = getSettings();
 		
-	    service.startNewPipeline(new WrapperJob(taskId,query,15,10),settings,Util.jobSettings(settings));
+	    service.startNewPipeline(new WrapperJob(taskId,query,email,15,10),settings,Util.jobSettings(settings));
 	}
 }

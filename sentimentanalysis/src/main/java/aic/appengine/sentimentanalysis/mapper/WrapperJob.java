@@ -1,5 +1,6 @@
 package aic.appengine.sentimentanalysis.mapper;
 
+import java.util.Date;
 import java.util.List;
 
 import com.google.appengine.api.datastore.DatastoreService;
@@ -19,21 +20,24 @@ import com.google.appengine.tools.mapreduce.inputs.DatastoreInput;
 import com.google.appengine.tools.mapreduce.outputs.InMemoryOutput;
 import com.google.appengine.tools.pipeline.FutureValue;
 import com.google.appengine.tools.pipeline.Job1;
-import com.google.appengine.tools.pipeline.Job2;
+import com.google.appengine.tools.pipeline.Job3;
 import com.google.appengine.tools.pipeline.Value;
 
 public class WrapperJob extends Job1<Void,MapReduceSettings>{
 	private static final long serialVersionUID = -3988602398941459031L;
-	private long taskId;
+	private Long taskId;
 	private String query;
+	private String email;
 	private int mapShardCount;
 	private int reduceShardCount;
 	
-	public WrapperJob(long taskId, String search, int mapShardCount,
-			int reduceShardCount) {
+
+	public WrapperJob(Long taskId, String query, String email,
+			int mapShardCount, int reduceShardCount) {
 		super();
 		this.taskId = taskId;
-		this.query = search;
+		this.query = query;
+		this.email = email;
 		this.mapShardCount = mapShardCount;
 		this.reduceShardCount = reduceShardCount;
 	}
@@ -55,11 +59,11 @@ public class WrapperJob extends Job1<Void,MapReduceSettings>{
 	            new InMemoryOutput<KeyValue<String, Double>>(reduceShardCount));
 	}
 	
-	private static class FinalCleanupJob extends Job2<Void, Long,MapReduceResult<List<List<KeyValue<String, Double>>>>> {
+	private static class FinalCleanupJob extends Job3<Void, Long,String,MapReduceResult<List<List<KeyValue<String, Double>>>>> {
 		private static final long serialVersionUID = -7916067625541463185L;
 
 		@Override
-		public Value<Void> run(Long taskId,
+		public Value<Void> run(Long taskId,String email,
 				MapReduceResult<List<List<KeyValue<String, Double>>>> result) {
 			
 			double total = 0;
@@ -71,18 +75,32 @@ public class WrapperJob extends Job1<Void,MapReduceSettings>{
 				}
 			}
 			
-			if(count!=0){
-				//insert into datastore
-				try {
-					DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-					Key taskKey = KeyFactory.createKey("tasks", taskId);
-					Entity task = datastore.get(taskKey);
+			//insert into datastore
+			try {
+				DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+				
+				Key parentKey = KeyFactory.createKey("user", email);
+				Key taskKey = KeyFactory.createKey(parentKey,"task", taskId);
+
+				Entity task = datastore.get(taskKey);
+				if(count!=0){
 					task.setProperty("status", "COMPLETED");
 					task.setProperty("sentiment",total / count);
-					datastore.put(task);
-				} catch (EntityNotFoundException e) {
-					e.printStackTrace();
+				}else{
+					task.setProperty("status", "NOT FOUND");
 				}
+				
+				Object obj=task.getProperty("date");
+				if(obj instanceof Date){
+					Date start=(Date)obj;
+					Date end=new Date();
+					long duration=end.getTime()-start.getTime();
+					task.setProperty("duration", duration);
+				}
+				
+				datastore.put(task);
+			} catch (EntityNotFoundException e) {
+				e.printStackTrace();
 			}
 			
 			return null;
@@ -93,7 +111,7 @@ public class WrapperJob extends Job1<Void,MapReduceSettings>{
 	public Value<Void> run(MapReduceSettings settings) {
 		FutureValue<MapReduceResult<List<List<KeyValue<String, Double>>>>> result = futureCall(getMapReduceJob(), immediate(getMapReduceSpec()), immediate(settings),Util.jobSettings(settings));
 		
-		futureCall(new FinalCleanupJob(), immediate(taskId),result,Util.jobSettings(settings));
+		futureCall(new FinalCleanupJob(), immediate(taskId),immediate(email),result,Util.jobSettings(settings));
 		return null;
 	}
 

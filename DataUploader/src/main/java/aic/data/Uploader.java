@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
@@ -45,14 +46,17 @@ public class Uploader {
             http.setRequestProperty("Content-Type", "application/octet");
             http.setRequestProperty("Content-Length",
                     String.valueOf(data.length));
-            http.getOutputStream().write(data);
+            OutputStream httpout=http.getOutputStream();
+            httpout.write(data);
+            httpout.close();
+            
 
             // the request is only sent if we read in the data
             BufferedReader in2 = new BufferedReader(new InputStreamReader(
                     http.getInputStream()));
             String line2 = null;
             while ((line2 = in2.readLine()) != null) {
-                // System.out.println(line2);
+                //System.out.println(line2);
             }
             in2.close();
 
