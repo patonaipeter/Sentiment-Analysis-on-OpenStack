@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 public interface Strategy {
+	public static final int SERVER_MAX_COUNT = 10;
+	public static final int VM_ALLOCATE_TIME = 60;
+	
 	//returns the time in milliseconds that the thread should sleep
 	int getSleepTime();
 	
